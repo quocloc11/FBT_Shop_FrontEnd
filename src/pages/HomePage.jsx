@@ -3,6 +3,16 @@ import axios from "axios";
 import Product from "../components/Product"
 import { Link } from "react-router-dom";
 import { VITE_BACKEND_URL } from "../App";
+import { getProductAPI } from "../apis";
+import Header from "./Hearder/Header";
+import Body from "./Body/Body";
+import Footer from "./Footer/Footer";
+import Banner from "./Banner/Banner";
+import CategoryMenu from "./CategoryMenu/CategoryMenu";
+import Chatbot from "./Chatbot/ChatBox";
+import BodyProduct from "./Body/BodyProduct/BodyProduct";
+import ViewedProducts from "./ViewProduct/ViewProduct";
+import FlashSale from "./FlashSale/FlashSale";
 
 const HomePage = () => {
 
@@ -10,15 +20,23 @@ const HomePage = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const getProducts = async () => {
-        try{
-           setIsLoading(true); 
-           const response = await axios.get(`${VITE_BACKEND_URL}/api/products/`);
-           console.log(response.data);
-           setProducts(response.data);
-           setIsLoading(false);
+        try {
+            setIsLoading(true);
+            // const response = await axios.get(`${VITE_BACKEND_URL}/api/products/`);
 
-        } catch (error){
-           console.log(error);
+            getProductAPI().then(res => {
+
+                setProducts(res || [])
+            }).finally(() => {
+                setIsLoading(false);
+            })
+
+            // console.log(response.data);
+            // setProducts(response.data);
+            setIsLoading(false);
+
+        } catch (error) {
+            console.log(error);
         }
     }
 
@@ -27,38 +45,17 @@ const HomePage = () => {
     }, [])
 
     return (
-        <div>
-            <div>
-                <Link to="/create" className="inline-block mt-4 shadow-md bg-blue-700 text-white rounded-sm px-4 py-2 font-bold hover:bg-blue-600 hover:cursor-pointer">
-                    Create a Product
-                </Link>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
-                {isLoading ? (
-                    "Loading"
-                ) : (
-                    <>
-                    {products.length > 0 ? (
-                        <>
-
-                            {
-                                products.map((product, index) => {
-                                   return (
-                                     <Product key={index} product={product} getProducts={getProducts}/>
-                                   )
-                                })
-                            }
-                        </>
-                    ) : (
-                        <div>
-                            There is no product
-                        </div>
-                    )}
-                    
-                    </>
-                )}
-            </div>
-        </div>
+        <>
+            <Header />
+            <CategoryMenu />
+            <Banner />
+            <Chatbot />
+            <Body />
+            <FlashSale />
+            <BodyProduct />
+            <ViewedProducts />
+            <Footer />
+        </>
     )
 }
 

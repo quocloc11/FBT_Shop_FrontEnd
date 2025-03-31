@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { VITE_BACKEND_URL } from "../App";
+import { deleteAProductAPI } from "../apis";
 
 /* eslint-disable react/prop-types */
 const Product = ({ product, getProducts }) => {
@@ -17,12 +18,13 @@ const Product = ({ product, getProducts }) => {
             confirmButtonText: 'Yes, delete it!'
 
         })
-        if(result.isConfirmed){
-            try{
-                await axios.delete(`${VITE_BACKEND_URL}/api/products/${id}`);
+        if (result.isConfirmed) {
+            try {
+                //await axios.delete(`${VITE_BACKEND_URL}/api/products/${id}`);
+                await deleteAProductAPI(id)
                 toast.success("Delete a product successfully");
                 getProducts();
-            }catch(error){
+            } catch (error) {
                 toast.error(error.message);
             }
         }
@@ -39,12 +41,12 @@ const Product = ({ product, getProducts }) => {
 
                 <div className="mt-2 flex gap-4">
                     <Link to={`/edit/${product._id}`} className="inline-block w-full text-center shadow-md text-sm bg-gray-700 text-white rounded-sm px-4 py-1 font-bold hover:bg-gray-600 hover:cursor-pointer">Edit</Link>
-                    <button onClick={() => deleteProduct(product._id)}  className="inline-block w-full text-center shadow-md text-sm bg-red-700 text-white rounded-sm px-4 py-1 font-bold hover:bg-red-600 hover:cursor-pointer">Delete</button>
+                    <button onClick={() => deleteProduct(product._id)} className="inline-block w-full text-center shadow-md text-sm bg-red-700 text-white rounded-sm px-4 py-1 font-bold hover:bg-red-600 hover:cursor-pointer">Delete</button>
                 </div>
 
 
             </div>
-         
+
 
         </div>
     )
