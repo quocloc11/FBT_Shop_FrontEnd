@@ -23,7 +23,7 @@ import Logout from '@mui/icons-material/Logout';
 import { useConfirm } from 'material-ui-confirm';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { getProductAPI } from '../../apis';
+
 import { logOutAPI } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 

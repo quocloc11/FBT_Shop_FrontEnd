@@ -1,92 +1,3 @@
-// const Body = () => {
-//   return (
-//     <div className="bg-pink-300 p-6 text-center">
-//       <h2 className="text-3xl font-bold">Giá sốc cuối tuần!</h2>
-//       <p className="text-xl">Giảm đến 50% + Tặng voucher 10%</p>
-//       <button className="mt-4 bg-red-500 text-white px-6 py-2 rounded">Mua ngay</button>
-//     </div>
-//   );
-// };
-
-
-
-// import { useEffect, useState } from "react";
-// import axios from "axios";
-// import Product from "../../components/Product";
-// import { Link } from "react-router-dom";
-// import { VITE_BACKEND_URL } from "../../App";
-// import { getProductAPI } from "../../apis";
-
-// const Body = () => {
-
-//   const [products, setProducts] = useState([]);
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   const getProducts = async () => {
-//     try {
-//       setIsLoading(true);
-//       // const response = await axios.get(`${VITE_BACKEND_URL}/api/products/`);
-
-//       getProductAPI().then(res => {
-
-//         setProducts(res || [])
-//       }).finally(() => {
-//         setIsLoading(false);
-//       })
-
-//       // console.log(response.data);
-//       // setProducts(response.data);
-//       setIsLoading(false);
-
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   }
-
-//   useEffect(() => {
-//     getProducts();
-//   }, [])
-
-//   return (
-//     <div>
-//       <div>
-//         <Link to="/create" className="inline-block mt-4 shadow-md bg-blue-700 text-white rounded-sm px-4 py-2 font-bold hover:bg-blue-600 hover:cursor-pointer">
-//           Create a Product
-//         </Link>
-//       </div>
-//       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-5">
-//         {isLoading ? (
-//           "Loading"
-//         ) : (
-//           <>
-//             {products.length > 0 ? (
-//               <>
-
-//                 {
-//                   products.map((product, index) => {
-//                     return (
-//                       <Product key={index} product={product} getProducts={getProducts} />
-//                     )
-//                   })
-//                 }
-//               </>
-//             ) : (
-//               <div>
-//                 There is no product
-//               </div>
-//             )}
-
-//           </>
-//         )}
-//       </div>
-//     </div>
-//   )
-// }
-
-
-// export default Body;
-
-
 
 import React from "react";
 import { Container, Grid, Card, CardMedia, Typography, Button } from "@mui/material";
@@ -128,6 +39,18 @@ const banners = [
 
 ];
 
+const slugify = (str) =>
+  str
+    .replace(/Đ/g, "D")               // xử lý Đ
+    .replace(/đ/g, "d")               // xử lý đ
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")  // bỏ dấu
+    .toLowerCase()
+    .replace(/\s+/g, "-")             // space -> -
+    .replace(/[^\w-]+/g, "")          // bỏ ký tự đặc biệt
+    .replace(/--+/g, "-")             // bỏ gạch ngang dư
+    .replace(/^-+|-+$/g, "");         // bỏ gạch đầu/cuối
+
 const Body = () => {
   const navigate = useNavigate(); // Hook điều hướng
   return (
@@ -156,20 +79,6 @@ const Body = () => {
           ))}
         </Grid>
       </Swiper>
-
-
-      {/* Banner Section */}
-      {/* <Grid container spacing={2} sx={{ my: 2 }}>
-        {banners.map((banner, index) => (
-          <Grid item xs={12} sm={6} key={index}>
-            <Card>
-              <CardMedia component="img"
-                sx={{ width: "100%", height: "auto", objectFit: "cover", borderRadius: 2 }}
-                image={banner.image} alt={banner.alt} />
-            </Card>
-          </Grid>
-        ))}
-      </Grid> */}
 
 
       <Swiper
@@ -201,7 +110,7 @@ const Body = () => {
                   boxShadow: 3,
                 }
               }}
-                onClick={() => navigate(`dienthoai`)} // Điều hướng khi click
+                onClick={() => navigate(`/${slugify(category.name)}`)}
               >
                 <CardMedia
                   component="img"

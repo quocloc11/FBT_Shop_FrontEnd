@@ -31,6 +31,8 @@ export const updatedProductAPI = async (id, productData) => {
   return response.data
 }
 
+
+
 export const deleteAProductAPI = async (id) => {
   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/products/${id}`)
   return response.data
@@ -41,3 +43,33 @@ export const refreshTokenAPI = async () => {
   return response.data
 }
 
+
+export const createSaleProductAPI = async (salesProductData) => {
+  const response = await authorizedAxiosInstance.post(`${API_ROOT}/api/flash-sales`, salesProductData)
+  return response.data
+}
+export const getSaleProductAPI = async () => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/flash-sales/active`)
+  return response.data
+}
+export const updatedSaleProductAPI = async (id, productData) => {
+  const response = await authorizedAxiosInstance.put(`${API_ROOT}/flash-sales/${id}`, productData)
+  return response.data
+}
+
+
+
+export const deleteSaleAProductAPI = async (id) => {
+  const response = await authorizedAxiosInstance.delete(`${API_ROOT}/flash-sales/${id}`)
+  return response.data
+}
+
+export const addViewProductAPI = async (productData) => {
+  const response = await authorizedAxiosInstance.post(`${API_ROOT}/viewed-products`, productData)
+  return response.data
+}
+
+export const viewProductAPI = async () => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/viewed-products`)
+  return response.data
+}

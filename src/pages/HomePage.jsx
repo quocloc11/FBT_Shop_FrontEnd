@@ -3,7 +3,7 @@ import axios from "axios";
 import Product from "../components/Product"
 import { Link } from "react-router-dom";
 import { VITE_BACKEND_URL } from "../App";
-import { getProductAPI } from "../apis";
+
 import Header from "./Hearder/Header";
 import Body from "./Body/Body";
 import Footer from "./Footer/Footer";
@@ -13,6 +13,8 @@ import Chatbot from "./Chatbot/ChatBox";
 import BodyProduct from "./Body/BodyProduct/BodyProduct";
 import ViewedProducts from "./ViewProduct/ViewProduct";
 import FlashSale from "./FlashSale/FlashSale";
+import { getProductAPI } from "../apis";
+//import { getProductAPI } from "../components/redux/product/productSlice";
 
 const HomePage = () => {
 

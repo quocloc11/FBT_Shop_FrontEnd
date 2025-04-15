@@ -9,35 +9,15 @@ import CategoryMenu from "../../CategoryMenu/CategoryMenu";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../Footer/Footer";
 import { useLocation } from 'react-router-dom';
-import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
-const initialReviews = [
-  {
-    id: 1,
-    name: 'Vũ Thị Yến Anh',
-    content: 'Mình mới đổi 15pm lên 16pm tạm tính 18.000.000 nhưng vẫn hài lòng.',
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: 'Nguyễn Văn A',
-    content: 'Sản phẩm rất tốt, đáng tiền.',
-    rating: 4,
-  },
-];
-const videos = [
-  { title: "iPhone 15 Pro Max", url: "https://www.youtube.com/embed/8JnfIa84TnU" },
-  { title: "iPhone 15 Series", url: "https://www.youtube.com/embed/JGwWNGJdvx8" },
-
-];
-//import { Link } from "react-router-dom";
 const DetailProduct = () => {
-
-
   const location = useLocation();
+  const product = location.state || [];
+
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
-  const [reviews, setReviews] = useState(initialReviews);
+  const [reviews, setReviews] = useState(product);
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
 
@@ -68,7 +48,7 @@ const DetailProduct = () => {
             Trang chủ
           </Button>
           <Button
-            onClick={() => navigate("/dienthoai")}
+            onClick={() => navigate("/dien-thoai")}
             sx={{ cursor: "pointer", color: "blue", "&:hover": { textDecoration: "underline" } }}
           >
             Điện thoại
@@ -81,7 +61,7 @@ const DetailProduct = () => {
             <Card>
               <CardMedia
                 component="img"
-                image="https://cdn2.fptshop.com.vn/unsafe/750x0/filters:quality(100)/samssung_galaxy_s24_fe_den_7f4246d44a.png"
+                image={product.images}
                 alt="Samsung Galaxy S24 FE"
                 sx={{ height: 400 }}
               />
@@ -91,7 +71,7 @@ const DetailProduct = () => {
                 <CardMedia
                   key={index}
                   component="img"
-                  image="https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png"
+                  image={product.images}
                   alt="Thumbnail"
                   sx={{ width: 60, height: 60, mx: 1, cursor: "pointer" }}
                 />
@@ -102,9 +82,9 @@ const DetailProduct = () => {
           {/* Thông tin sản phẩm */}
           <Grid item xs={12} md={6}>
             <Typography variant="h5" fontWeight="bold">
-              Samsung Galaxy S24 FE 5G 128GB
+              {product.name}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" >
               No.00911818 | ⭐ 4.2 | 13 đánh giá | 36 bình luận
             </Typography>
 
@@ -136,10 +116,10 @@ const DetailProduct = () => {
             {/* Giá sản phẩm */}
             <Box mt={3}>
               <Typography variant="h4" color="error" fontWeight="bold">
-                13.490.000 ₫
+                {product.price} ₫
               </Typography>
               <Typography variant="body1" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
-                16.990.000 ₫
+                {product.price}
               </Typography>
               <Chip label="Giảm 3.500.000 ₫" color="success" variant="outlined" sx={{ mt: 1 }} />
             </Box>
@@ -150,6 +130,15 @@ const DetailProduct = () => {
                 Mua ngay
               </Button>
             </Box>
+
+            <Box mt={4}>
+              <Button size="large" >
+                Khuyến mãi nổi bật
+              </Button>
+              <Typography variant="body1" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
+                {product.promotion}
+              </Typography>
+            </Box>
           </Grid>
         </Grid>
 
@@ -157,11 +146,10 @@ const DetailProduct = () => {
         <Box mt={6}>
           <Typography variant="h6" fontWeight="bold">Thông số nổi bật</Typography>
           <Box mt={2}>
-            <Typography variant="body1">• Kích thước màn hình: 6.7 inch</Typography>
-            <Typography variant="body1">• Camera: 50 MP</Typography>
-            <Typography variant="body1">• RAM: 8 GB</Typography>
-            <Typography variant="body1">• NFC: Có</Typography>
+            <Typography variant="body1">{product.specs}</Typography>
           </Box>
+          <Typography variant="h6" fontWeight="bold">Mô Tả Sản Phẩm</Typography>
+          <Typography variant="body1">{product.description}</Typography>
         </Box>
 
         {/* Chính sách bảo hành */}
@@ -173,21 +161,20 @@ const DetailProduct = () => {
         </Box>
 
         <Grid container spacing={2}>
-          {videos.map((video, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card>
-                <CardMedia
-                  component="iframe"
-                  src={video.url}
-                  height="200"
-                  title={video.title}
-                />
-                <Typography variant="h6" sx={{ p: 2 }}>
-                  {video.title}
-                </Typography>
-              </Card>
-            </Grid>
-          ))}
+
+          <Grid item xs={12} sm={6} md={4}>
+            <Card>
+              <CardMedia
+                component="iframe"
+                src={product.video}
+                height="200"
+              />
+              <Typography variant="h6" sx={{ p: 2 }}>
+
+              </Typography>
+            </Card>
+          </Grid>
+
         </Grid>
 
         <Box sx={{ maxWidth: 600, margin: '0 auto', padding: 2 }}>
@@ -226,7 +213,7 @@ const DetailProduct = () => {
           <Divider sx={{ margin: '20px 0' }} />
 
           <List>
-            {reviews.map((review) => (
+            {/* {reviews.map((review) => (
               <ListItem key={review.id}>
                 <ListItemAvatar>
                   <Avatar>{review.name.charAt(0)}</Avatar>
@@ -241,7 +228,7 @@ const DetailProduct = () => {
                   }
                 />
               </ListItem>
-            ))}
+            ))} */}
           </List>
         </Box>
 

@@ -211,7 +211,7 @@ const FlashSale = () => {
           // autoplay={{ delay: 3000 }}
           modules={[SwiperGrid, Pagination, Navigation, Autoplay]}
           className="mySwiper"
-          onClick={() => navigate(`/dienthoai/detail`)}
+          onClick={() => navigate(`/dien-thoai/detail`)}
         >
           {products.map((product, index) => (
             <SwiperSlide key={index}>

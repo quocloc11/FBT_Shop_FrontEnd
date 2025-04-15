@@ -263,14 +263,14 @@
 // };
 
 // export default ProductList;
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container, Grid, Card, CardContent, Link,
   Breadcrumbs, CardMedia, Typography, FormControl, Divider,
   InputLabel, Select, MenuItem, Checkbox, ListItemText, Slider, Box, FormControlLabel
 } from "@mui/material";
 import Header from "../../Hearder/Header";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -278,101 +278,51 @@ import "swiper/css/pagination";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import CategoryMenu from "../../CategoryMenu/CategoryMenu";
 import Footer from "../../Footer/Footer";
+import { addViewProductAPI, getProductAPI } from "../../../apis";
+import slugify from 'slugify';
+
 const banners = [
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
 ];
-const priceFilters = [
-  { label: 'Tất cả', value: 'all' },
-  { label: 'Dưới 2 triệu', value: 'under-2' },
-  { label: 'Từ 2 - 4 triệu', value: '2-4' },
-  { label: 'Từ 4 - 7 triệu', value: '4-7' },
-  { label: 'Từ 7 - 13 triệu', value: '7-13' },
-  { label: 'Từ 13 - 20 triệu', value: '13-20' },
-  { label: 'Trên 20 triệu', value: 'above-20' },
-];
-const products = [
-  {
-    id: 1,
-    name: "iPhone 16 Pro Max",
-    price: 30990000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "iOS",
-  },
-  {
-    id: 2,
-    name: "Samsung Galaxy S24 FE",
-    price: 13490000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["128GB", "256GB"],
-    os: "Android",
-  },
-  {
-    id: 3,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-  {
-    id: 4,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-  {
-    id: 5,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-  {
-    id: 6,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-  {
-    id: 7,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-  {
-    id: 8,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-  {
-    id: 9,
-    name: "Samsung Galaxy Z Fold6",
-    price: 36690000,
-    image: "https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/iphone_15_pro_max_f589ed5358.png",
-    rom: ["256GB", "512GB"],
-    os: "Android",
-  },
-];
-const brands = ["Apple (iPhone)", "Samsung", "HONOR", "OPPO", "Xiaomi", "Tecno", "Realme", "Nubia - ZTE", "Nokia", "Benco", "TCL", "Masstel"];
+// const priceFilters = [
+
+//const brands = ["Apple (iPhone)", "Samsung", "HONOR", "OPPO", "Xiaomi", "Tecno", "Realme", "Nubia - ZTE", "Nokia", "Benco", "TCL", "Masstel"];
 const ProductList = () => {
   const [filterOs, setFilterOs] = useState([]);
   const [sortBy, setSortBy] = useState("none");
   const [priceRange, setPriceRange] = useState([0, 50000000]);
   const navigate = useNavigate();
   const [selectedPrice, setSelectedPrice] = useState('all');
+  const { category } = useParams();
+  const [products, setProducts] = useState([]);
+
+  const location = useLocation();
+  const product = location.state;
+  // Hàm chuyển category về dạng chuẩn (slug)
+  const normalizeCategory = (category) => {
+    return category
+      .toLowerCase()
+      .normalize("NFD") // tách dấu
+      .replace(/[\u0300-\u036f]/g, "") // xóa dấu
+      .replace(/\s+/g, "-"); // thay space bằng dấu gạch nối
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getProductAPI();
+        // Lọc sản phẩm theo category
+        const filtered = response.filter(p => p.category === category);
+        setProducts(filtered);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [category]);
 
   const handleChange = (value) => {
     setSelectedPrice(value);
@@ -397,7 +347,11 @@ const ProductList = () => {
       if (sortBy === "priceDesc") return b.price - a.price;
       return 0;
     });
-
+  console.log('product', product)
+  const handleClickProduct = async (product) => {
+    await addViewProductAPI(product); // Gọi API trước
+    navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product }); // Sau đó chuyển trang
+  };
   return (
     <>
       <Header />
@@ -405,15 +359,25 @@ const ProductList = () => {
         <CategoryMenu />
         <Breadcrumbs aria-label="breadcrumb" sx={{ mt: 2 }}>
           <Link href="/" underline="hover">Trang chủ</Link>
-          <Typography color="textPrimary">Điện thoại</Typography>
+          {/* <Typography color="textPrimary">{products?.category}</Typography> */}
+          <Link color="textPrimary">{product?.category}</Link>
+
         </Breadcrumbs>
 
         {/* Tiêu đề */}
-        <Typography variant="h4" fontWeight="bold" mt={2}>Điện thoại</Typography>
+        <Typography variant="h4" fontWeight="bold" mt={2}>
+          {products[0]?.category || "Danh mục"}
+        </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", mt: 1 }}>
-          {brands.map((brand) => (
+          {/* {brands.map((brand) => (
             <Typography key={brand} sx={{ mr: 2, cursor: "pointer", color: "blue" }}>{brand}</Typography>
+          ))} */}
+
+          {products.map((product) => (
+            <Typography key={product.id} sx={{ mr: 2, cursor: "pointer", color: "blue" }}>{product?.brand}</Typography>
+
           ))}
+
         </Box>
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
@@ -446,19 +410,7 @@ const ProductList = () => {
               </Typography>
               <Typography variant="subtitle1">Mức giá</Typography>
               <Divider />
-              {priceFilters.map((filter) => (
-                <FormControlLabel
-                  key={filter.value}
-                  control={
-                    <Checkbox
-                      checked={selectedPrice === filter.value}
-                      onChange={() => handleChange(filter.value)}
-                      color="primary"
-                    />
-                  }
-                  label={filter.label}
-                />
-              ))}
+
             </Box>
             <Box sx={{ width: 250, padding: 2, border: '1px solid #ccc' }}>
 
@@ -504,20 +456,26 @@ const ProductList = () => {
 
           <Grid item xs={12} md={9}>
             <Grid container spacing={2}>
-              {filteredProducts.map((product) => (
+              {products.map((product) => (
                 <Grid item xs={12} sm={6} md={3} key={product.id}>
-                  <Card onClick={() => navigate(`/dienthoai/detail`)} sx={{ cursor: "pointer", transition: "0.3s", '&:hover': { transform: "scale(1.05)" } }}>
-                    <CardMedia component="img" height="200" image={product.image} alt={product.name} />
+                  {/* onClick={() => navigate(`/${slugify(category.name)}`)} */}
+
+                  <Card
+                    onClick={() => handleClickProduct(product)}
+                  >
+                    <CardMedia component="img" height="200" image={product.images} alt={product.name} />
                     <CardContent>
                       <Typography variant="h6">{product.name}</Typography>
+                      <Typography variant="h6">{product.stock}</Typography>
+                      <Typography variant="h6">{product.promotion}</Typography>
                       <Typography variant="body1" color="primary">
                         {product.price.toLocaleString()} đ
                       </Typography>
-                      <Typography variant="body2">Dung lượng ROM: {product.rom.join(", ")}</Typography>
                     </CardContent>
                   </Card>
                 </Grid>
               ))}
+
             </Grid>
           </Grid>
         </Grid>

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { VITE_BACKEND_URL } from "../App";
 import { getProductAPI, updatedProductAPI } from "../apis";
+//import { getProductAPI } from "../components/redux/product/productSlice";
 
 
 const EditPage = () => {
