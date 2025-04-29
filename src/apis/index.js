@@ -58,7 +58,6 @@ export const updatedSaleProductAPI = async (id, productData) => {
 }
 
 
-
 export const deleteSaleAProductAPI = async (id) => {
   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/flash-sales/${id}`)
   return response.data
@@ -73,3 +72,62 @@ export const viewProductAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/viewed-products`)
   return response.data
 }
+
+
+
+export const addCommentsAPI = async (id, Data) => {
+  const response = await authorizedAxiosInstance.post(`${API_ROOT}/comments/${id}`, Data)
+  return response.data
+}
+export const getCommentsAPI = async (id) => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/comments/${id}`)
+  return response.data
+}
+
+export const deleteCommentsAPI = async (id, commentId) => {
+  const response = await authorizedAxiosInstance.delete(`${API_ROOT}/comments/${id}/${commentId}`)
+  return response.data
+}
+
+
+// export const createCartProductAPI = async (product) => {
+//   const response = await authorizedAxiosInstance.post(`${API_ROOT}/cart`, product)
+//   return response.data
+// }
+
+// export const getCartProductAPI = async () => {
+//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/cart`)
+//   return response.data
+// }
+
+
+// export const deleteCartProductAPI = async (id) => {
+//   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/cart/${id}`)
+//   return response.data
+// }
+
+// export const createOrderProductAPI = async (order) => {
+//   const response = await authorizedAxiosInstance.post(`${API_ROOT}/order`, order)
+//   return response.data
+// }
+
+// export const getOrderProductAPI = async () => {
+//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/order`)
+//   return response.data
+// }
+
+// export const getOrderByIdProductAPI = async (id) => {
+//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/order/${id}`)
+//   return response.data
+// }
+
+// export const deleteOrderProductAPI = async (id) => {
+//   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/order/${id}`)
+//   return response.data
+// }
+
+
+// export const statusOrderProductAPI = async (id) => {
+//   const response = await authorizedAxiosInstance.patch(`${API_ROOT}/order/${id}`)
+//   return response.data
+// }

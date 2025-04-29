@@ -27,12 +27,28 @@ const Banner = () => {
       >
         {banners.map((image, index) => (
           <SwiperSlide key={index}>
-            <img
-              src={image}
-              alt={`Banner ${index + 1}`}
-              style={{ width: "100%", height: "auto", display: "block" }}
-            />
+            <Box sx={{ position: "relative", width: "100%" }}>
+              <img
+                src={image}
+                alt={`Banner ${index + 1}`}
+                style={{ width: "100%", height: "auto", display: "block" }}
+              />
+              {/* Khối màu gắn dưới ảnh */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "50px",
+                  //backgroundColor: "#ffe4e6",
+                  zIndex: 1,
+                  opacity: 0.9,
+                }}
+              />
+            </Box>
           </SwiperSlide>
+
         ))}
       </Swiper>
     </Box>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaShoppingCart, FaBars, FaUser } from "react-icons/fa";
-import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer, Badge } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Search, ShoppingCart } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -19,6 +19,9 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import { useSelector } from "react-redux";
+import { selectOrders } from "../../components/redux/order/orderSlice";
+import { selectCartItems } from "../../components/redux/cart/cartSlice";
 const categories = [
   { icon: <TvIcon />, label: "Tivi, Tủ lạnh, Máy lạnh - Điều hòa" },
   { icon: <LocalLaundryServiceIcon />, label: "Máy giặt, Máy sấy, Tủ sấy" },
@@ -48,6 +51,9 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
+  const carts = useSelector(selectCartItems);
+
+  const cartCount = carts?.items?.length
   const handleMouseEnter = () => {
     setOpen(true);
     setIsHovering(true);
@@ -59,7 +65,7 @@ const Header = () => {
     setOpen(false);
 
   };
-
+  //const cartCount = 4;
   const navigate = useNavigate();
   // Hiển thị menu khi di chuột vào
 
@@ -188,12 +194,13 @@ const Header = () => {
         </Box>
 
         {/* Giỏ hàng */}
+        <IconButton sx={{ color: 'white' }}>
+          <Profiles />
+        </IconButton>
         <Box sx={{ display: 'flex', alignItems: 'center' }}
           onClick={() => navigate(`/gio-hang`)}
         >
-          <IconButton sx={{ color: 'white' }}>
-            <Profiles />
-          </IconButton>
+
           <Button
             variant="contained"
             sx={{
@@ -207,8 +214,11 @@ const Header = () => {
               }
             }}
           >
-            <ShoppingCart sx={{ mr: 1 }} /> Giỏ hàng
-
+            {/* <ShoppingCart sx={{ mr: 1 }} /> Giỏ hàng */}
+            <Badge badgeContent={cartCount} color="error">
+              <ShoppingCart />
+            </Badge>
+            <span style={{ marginLeft: 6 }}>Giỏ hàng</span>
           </Button>
         </Box>
       </Box>

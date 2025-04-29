@@ -48,15 +48,12 @@ export default function ViewedProducts() {
     <div className="px-16">
       <h2 className="text-xl font-bold mb-3">Sản phẩm đã xem</h2>
       <Swiper
-        modules={[Navigation, Pagination]}
+        modules={[Navigation]}
         spaceBetween={20}
-        slidesPerView={4}
+        slidesPerView={5}
         navigation
         pagination={{ clickable: true }}
-        breakpoints={{
-          640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
-        }}
+
       >
         {Array.isArray(products) && products.length > 0 ? (
           products.map((item, index) => {
@@ -67,13 +64,15 @@ export default function ViewedProducts() {
             return (
               <SwiperSlide key={index}>
                 <div
+
                   className="bg-white p-4 rounded-xl shadow-md"
                   onClick={() => navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product })}
                 >
                   <img
                     src={product?.images?.length > 0 ? product.images : "https://via.placeholder.com/150"}
                     alt={product?.name || "Sản phẩm"}
-                    className="w-full h-40 object-contain"
+                    className="w-full h-40 object-contain cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:opacity-90"
+
                     loading="lazy"
                   />
 
