@@ -16,10 +16,35 @@ export const registerAPI = async (Data) => {
   return response.data
 }
 
-export const getProductAPI = async () => {
-  const response = await authorizedAxiosInstance.get(`${API_ROOT}/products`)
-  return response.data
-}
+// export const getProductAPI = async ({ page, limit }) => {
+//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/products?page=${page}&limit=${limit}`)
+//   return response.data
+// }
+// export const getProductAPI = async ({ page, limit } = {}) => {
+//   let url = `${API_ROOT}/products`;
+
+//   // Nếu có truyền page và limit thì thêm query string
+//   if (page !== undefined && limit !== undefined) {
+//     url += `?page=${page}&limit=${limit}`;
+//   }
+
+//   const response = await authorizedAxiosInstance.get(url);
+//   return response.data;
+// };
+
+export const getProductAPI = async ({ page, limit, category } = {}) => {
+  const params = new URLSearchParams();
+
+  if (page !== undefined) params.append('page', page);
+  if (limit !== undefined) params.append('limit', limit);
+  if (category) params.append('category', category); // ← thêm category vào
+
+  const url = `${API_ROOT}/products?${params.toString()}`;
+
+  const response = await authorizedAxiosInstance.get(url);
+  return response.data;
+};
+
 
 export const createProductAPI = async (productData) => {
   const response = await authorizedAxiosInstance.post(`${API_ROOT}/products`, productData)
@@ -38,6 +63,11 @@ export const deleteAProductAPI = async (id) => {
   return response.data
 }
 
+export const updatedSaleProductAPI = async (id, flaseSale) => {
+  const response = await authorizedAxiosInstance.put(`${API_ROOT}/products/${id}/flash-sales`, flaseSale)
+  return response.data
+}
+
 export const refreshTokenAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/users/refresh_token`)
   return response.data
@@ -52,10 +82,7 @@ export const getSaleProductAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/flash-sales/active`)
   return response.data
 }
-export const updatedSaleProductAPI = async (id, productData) => {
-  const response = await authorizedAxiosInstance.put(`${API_ROOT}/flash-sales/${id}`, productData)
-  return response.data
-}
+
 
 
 export const deleteSaleAProductAPI = async (id) => {

@@ -24,8 +24,8 @@ import { useConfirm } from 'material-ui-confirm';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-import { logOutAPI } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
+import { logOutAPI, selectCurrentUser } from '../redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Profiles() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -38,7 +38,7 @@ function Profiles() {
     setAnchorEl(null);
   }
   const dispatch = useDispatch()
-  // const currentUser = useSelector(selectCurrentUser)
+  const currentUser = useSelector(selectCurrentUser)
   //const currentUser = getProductAPI()
   const confirmLogout = useConfirm()
 
@@ -80,7 +80,7 @@ function Profiles() {
           <Avatar
             sx={{ width: 36, height: 36 }}
             alt='quocloc'
-          //src={currentUser?.avatar}
+            src={currentUser?.avatar}
 
           />
         </IconButton>

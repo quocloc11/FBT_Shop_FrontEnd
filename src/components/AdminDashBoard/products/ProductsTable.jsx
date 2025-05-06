@@ -27,7 +27,8 @@ const ProductsTable = () => {
 		specs: "",
 		quantity: 0,
 		images: "",
-		brand: ""
+		brand: "",
+		//	flashSale: false
 	});
 
 	// Gọi API để lấy danh sách sản phẩm	
@@ -36,8 +37,8 @@ const ProductsTable = () => {
 			try {
 				//const resoponse=dispatch(getProductAPI())
 				const response = await getProductAPI(); // 🟢 Đổi URL thành API của bạn
-				setProducts(response); // Cập nhật state với dữ liệu từ API
-				setFilteredProducts(response);
+				setProducts(response.products); // Cập nhật state với dữ liệu từ API
+				setFilteredProducts(response.products);
 			} catch (error) {
 				console.error("Error fetching products:", error);
 			}
@@ -108,7 +109,8 @@ const ProductsTable = () => {
 					specs: "",
 					quantity: 0,
 					brand: "",
-					images: []
+					images: [],
+					//	flashSale: false
 				});
 			} else {
 				console.error("API response invalid:", response);
@@ -230,12 +232,12 @@ const ProductsTable = () => {
 								</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.category}</td>
 								{/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.quantity}</td>
-								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.promotion}</td> */}
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.promotion}</td>  */}
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-									${product.price.toFixed(2)}
+									{product.price.toFixed(2)} đ
 								</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.stock}</td>
-								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.sales}</td>
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.quantity}</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
 									<button
 										onClick={() => handleEditProduct(product)}
@@ -290,18 +292,6 @@ const ProductsTable = () => {
 							className="space-y-4"
 						>
 							<div className="grid grid-cols-2 gap-4">
-								{/* {["name", "category", "price", "stock", "video", "promotion", "specs", "quantity"].map((field) => (
-									<div key={field}>
-										<label className="text-sm text-gray-300 capitalize">{field}</label>
-										<input
-											type={["price", "stock", "quantity"].includes(field) ? "number" : "text"}
-											className="w-full p-2 mt-1 bg-gray-700 text-gray-300 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-											value={newProduct[field] || ""}
-											onChange={(e) => setNewProduct({ ...newProduct, [field]: e.target.value })}
-											required
-										/>
-									</div>
-								))} */}
 
 								{["name", "category", "price", "stock", "video", "promotion", "specs", "quantity", "brand"].map((field) => (
 									<div key={field}>
@@ -351,6 +341,19 @@ const ProductsTable = () => {
 									/>
 								</div>
 							</div>
+							{/* <div>
+								<label className="text-sm text-gray-300 capitalize">flashSale</label>
+								<select
+									className="w-full p-2 mt-1 bg-gray-700 text-gray-300 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+									value={newProduct.flashSale}
+									onChange={(e) => setNewProduct({ ...newProduct, flashSale: e.target.value === 'true' })}
+									required
+								>
+									<option value="false">Không</option>
+									<option value="true">Có</option>
+								</select>
+							</div> */}
+
 							{/* Image preview */}
 							{newProduct.images && newProduct.images.length > 0 && (
 								<div className="mt-4">

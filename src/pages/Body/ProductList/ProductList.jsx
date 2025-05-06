@@ -18,15 +18,14 @@ import CategoryMenu from "../../CategoryMenu/CategoryMenu";
 import Footer from "../../Footer/Footer";
 import { addViewProductAPI, getProductAPI } from "../../../apis";
 import slugify from 'slugify';
+import { Pagination as MuiPagination } from '@mui/material';
+
 
 const banners = [
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
 ];
-// const priceFilters = [
-
-//const brands = ["Apple (iPhone)", "Samsung", "HONOR", "OPPO", "Xiaomi", "Tecno", "Realme", "Nubia - ZTE", "Nokia", "Benco", "TCL", "Masstel"];
 const ProductList = () => {
   const [filterOs, setFilterOs] = useState([]);
   const [sortBy, setSortBy] = useState("none");
@@ -34,62 +33,129 @@ const ProductList = () => {
   const navigate = useNavigate();
   const [selectedPrice, setSelectedPrice] = useState('all');
   const { category } = useParams();
+  const selectedCategory = category;
   const [products, setProducts] = useState([]);
+  const [selectedPrices, setSelectedPrices] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Số sản phẩm mỗi trang
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [selectedBrand, setSelectedBrand] = useState('');
 
   const location = useLocation();
   const product = location.state;
-  // Hàm chuyển category về dạng chuẩn (slug)
-  const normalizeCategory = (category) => {
-    return category
-      .toLowerCase()
-      .normalize("NFD") // tách dấu
-      .replace(/[\u0300-\u036f]/g, "") // xóa dấu
-      .replace(/\s+/g, "-"); // thay space bằng dấu gạch nối
-  };
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await getProductAPI();
-        // Lọc sản phẩm theo category
-        const filtered = response.filter(p => p.category === category);
-        setProducts(filtered);
+        const response = await getProductAPI({
+          page: currentPage,
+          limit: itemsPerPage,
+          category: selectedCategory // ← truyền từ URL hoặc state
+        });
+
+        setProducts(response.products);
+        setTotalPages(response.totalPages);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
     };
 
     fetchProducts();
-  }, [category]);
-
-  const handleChange = (value) => {
-    setSelectedPrice(value);
-  };
-  const handleFilterChange = (event) => {
-    setFilterOs(event.target.value);
-  };
+  }, [currentPage, selectedCategory]);
 
   const handleSortChange = (event) => {
     setSortBy(event.target.value);
   };
-
-  const handlePriceChange = (event, newValue) => {
+  const handleSliderPriceChange = (event, newValue) => {
     setPriceRange(newValue);
   };
 
+  const priceOptions = [
+    { label: "Tất cả", value: "all" },
+    { label: "Dưới 500K", value: "under_500" },
+    { label: "500K - 1 triệu", value: "500_1tr" },
+    { label: "Trên 1 triệu", value: "above_1tr" }
+  ];
+  const handlePriceChange = (event) => {
+    const value = event.target.value;
+
+    if (value === "all") {
+      // Nếu chọn "Tất cả", bỏ chọn tất cả các filter khác
+      setSelectedPrices([]);
+      return;
+    }
+
+    setSelectedPrices((prev) =>
+      prev.includes(value)
+        ? prev.filter((v) => v !== value) // Bỏ chọn nếu đã có
+        : [...prev.filter((v) => v !== "all"), value] // Thêm mới
+    );
+  };
+  // const filteredProducts = products.filter((product) => {
+  //   const price = product.price;
+
+  //   const isInSliderRange = price >= priceRange[0] && price <= priceRange[1];
+
+  //   const matchesCheckbox = selectedPrices.length === 0 || selectedPrices.some((val) => {
+  //     if (val === "under_500") return price < 500000;
+  //     if (val === "500_1tr") return price >= 500000 && price <= 1000000;
+  //     if (val === "above_1tr") return price > 1000000;
+  //     return true;
+  //   });
+
+  //   const matchesBrand = !selectedBrand || selectedBrand === "" || product.brand === selectedBrand;
+
+  //   return isInSliderRange && matchesCheckbox && matchesBrand;
+  // });
+
+
+
+
+
+  // const filteredProducts = products
+  //   .filter((product) => (filterOs.length === 0 ? true : filterOs.includes(product.os)))
+  //   .filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
+  //   .filter(product => selectedBrand ? product.brand === selectedBrand : true)
+
+  //   .sort((a, b) => {
+  //     if (sortBy === "priceAsc") return a.price - b.price;
+  //     if (sortBy === "priceDesc") return b.price - a.price;
+  //     return 0;
+  //   });
   const filteredProducts = products
-    .filter((product) => (filterOs.length === 0 ? true : filterOs.includes(product.os)))
-    .filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
+    .filter((product) => {
+      const price = product.price;
+
+      const isInSliderRange = price >= priceRange[0] && price <= priceRange[1];
+
+      const matchesCheckbox = selectedPrices.length === 0 || selectedPrices.some((val) => {
+        if (val === "under_500") return price < 500000;
+        if (val === "500_1tr") return price >= 500000 && price <= 1000000;
+        if (val === "above_1tr") return price > 1000000;
+        return true;
+      });
+
+      const matchesBrand = !selectedBrand || selectedBrand === "" || product.brand === selectedBrand;
+
+      return isInSliderRange && matchesCheckbox && matchesBrand;
+    })
     .sort((a, b) => {
       if (sortBy === "priceAsc") return a.price - b.price;
       if (sortBy === "priceDesc") return b.price - a.price;
-      return 0;
+      return 0; // mặc định không sắp xếp
     });
-  console.log('product', product)
+
   const handleClickProduct = async (product) => {
     await addViewProductAPI(product); // Gọi API trước
     navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product }); // Sau đó chuyển trang
   };
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  // }, [sortBy, priceRange, filterOs]);
+
   return (
     <>
       <Header />
@@ -109,10 +175,6 @@ const ProductList = () => {
         </Typography>
 
         <Box sx={{ display: "flex", flexWrap: "wrap", mt: 1 }}>
-          {/* {brands.map((brand) => (
-            <Typography key={brand} sx={{ mr: 2, cursor: "pointer", color: "blue" }}>{brand}</Typography>
-          ))} */}
-
           {products.map((product) => (
             <Typography key={product.id} sx={{ mr: 2, cursor: "pointer", color: "blue" }}>{product?.brand}</Typography>
 
@@ -156,15 +218,21 @@ const ProductList = () => {
               </Typography>
               <Divider sx={{ mb: 1 }} />
 
-              <FormGroup>
-                <FormControlLabel control={<Checkbox defaultChecked />} label="Tất cả" />
-                <FormControlLabel control={<Checkbox />} label="Dưới 2 triệu" />
-                <FormControlLabel control={<Checkbox />} label="Từ 2 - 4 triệu" />
-                <FormControlLabel control={<Checkbox />} label="Từ 4 - 7 triệu" />
-                <FormControlLabel control={<Checkbox />} label="Từ 7 - 13 triệu" />
-                <FormControlLabel control={<Checkbox />} label="Từ 13 - 20 triệu" />
-                <FormControlLabel control={<Checkbox />} label="Trên 20 triệu" />
-              </FormGroup>
+              {priceOptions.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  control={
+                    <Checkbox
+                      checked={selectedPrices.includes(option.value)}
+                      onChange={handlePriceChange}
+                      value={option.value}
+                    />
+                  }
+                  label={option.label}
+                />
+              ))}
+
+
 
               <Typography gutterBottom mt={2}>
                 Hoặc nhập khoảng giá phù hợp với bạn:
@@ -186,11 +254,11 @@ const ProductList = () => {
 
               <Slider
                 value={priceRange}
-                onChange={handlePriceChange}
+                onChange={handleSliderPriceChange}
                 valueLabelDisplay="auto"
                 min={0}
                 max={50000000}
-                step={1000000}
+                step={100000}
               />
             </Box>
           </Grid>
@@ -210,18 +278,21 @@ const ProductList = () => {
             >
               {/* Lọc nhanh */}
               <FormControl sx={{ minWidth: 200 }}>
-                <InputLabel>Hang San Xuat:</InputLabel>
+                <InputLabel>Hãng Sản Xuất:</InputLabel>
                 <Select
-                  // value={filterValue}
-                  // onChange={onFilterChange}
-                  label="Lọc nhanh:"
+                  value={selectedBrand}
+                  onChange={(e) => setSelectedBrand(e.target.value)}
+                  label="Hãng Sản Xuất"
                 >
                   <MenuItem value=""><em>Tất cả</em></MenuItem>
-                  <MenuItem value="apple">Apple</MenuItem>
-                  <MenuItem value="samsung">Samsung</MenuItem>
-                  <MenuItem value="xiaomi">Xiaomi</MenuItem>
+                  {products.map((product) => (
+                    <MenuItem key={product.id} value={product.brand}>
+                      {product.brand}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
+
 
             </Box>
             <Box sx={{ mb: 2 }}>
@@ -240,8 +311,9 @@ const ProductList = () => {
 
                 {/* Dòng thông báo kết quả */}
                 <Typography sx={{ mt: 2, ml: 1 }}>
-                  Tìm thấy <strong>118</strong> kết quả
+                  Tìm thấy <strong>{filteredProducts.length}</strong> kết quả
                 </Typography>
+
                 {/* Sắp xếp */}
                 <FormControl sx={{ minWidth: 200 }}>
                   <InputLabel>Sắp xếp theo</InputLabel>
@@ -262,18 +334,16 @@ const ProductList = () => {
 
 
             <Grid container spacing={2}>
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <Grid item xs={12} sm={6} md={3} key={product.id}>
-                  {/* onClick={() => navigate(`/${slugify(category.name)}`)} */}
-
                   <Card
                     onClick={() => handleClickProduct(product)}
                     sx={{
-                      cursor: 'pointer', // hiện biểu tượng tay khi hover
+                      cursor: 'pointer',
                       transition: 'transform 0.2s ease',
                       '&:hover': {
-                        transform: 'scale(1.02)', // hiệu ứng phóng nhẹ khi hover (tuỳ chọn)
-                        boxShadow: 3,              // thêm bóng đổ khi hover
+                        transform: 'scale(1.02)',
+                        boxShadow: 3,
                       },
                     }}
                   >
@@ -283,12 +353,11 @@ const ProductList = () => {
                       alt={product.name}
                       sx={{
                         height: 200,
-                        width: "100%",
-                        objectFit: "cover", // hoặc "contain"
+                        width: '100%',
+                        objectFit: 'cover',
                         borderRadius: 1,
                       }}
                     />
-
                     <CardContent>
                       <Typography variant="h6">{product.name}</Typography>
                       <Typography variant="h6">{product.stock}</Typography>
@@ -300,10 +369,23 @@ const ProductList = () => {
                   </Card>
                 </Grid>
               ))}
-
             </Grid>
+
+
           </Grid>
         </Grid>
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <MuiPagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(event, value) => setCurrentPage(value)}
+            color="primary"
+          />
+        </Box>
+
+
+
       </Container >
       <Footer />
     </>

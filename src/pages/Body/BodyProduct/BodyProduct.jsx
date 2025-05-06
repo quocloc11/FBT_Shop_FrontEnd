@@ -36,7 +36,8 @@ const BodyProduct = () => {
       try {
         const response = await getProductAPI();
         // console.log('response', response)
-        setProduct(response)
+        setProduct(response.products);
+        //setProduct(response)
       } catch (error) {
         console.error("Error fetching products:", error);
       }

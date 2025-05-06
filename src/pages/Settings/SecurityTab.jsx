@@ -7,19 +7,20 @@ import PasswordIcon from '@mui/icons-material/Password'
 import LockResetIcon from '@mui/icons-material/LockReset'
 import LockIcon from '@mui/icons-material/Lock'
 import LogoutIcon from '@mui/icons-material/Logout'
+import { useNavigate } from 'react-router-dom';
 
 import { FIELD_REQUIRED_MESSAGE, PASSWORD_RULE, PASSWORD_RULE_MESSAGE } from '../../utils/validators.js'
-//import FieldErrorAlert from '~/components/Form/FieldErrorAlert'
+import FieldErrorAlert from '../../components/Form/FieldErrorAlert.jsx'
 import { useForm } from 'react-hook-form'
 import { useConfirm } from 'material-ui-confirm'
 import { toast } from 'react-toastify'
-import { logOutAPI } from '../../components/redux/user/userSlice.js'
 import { useDispatch } from 'react-redux'
-// import { logoutUserAPI, updateUserAPI } from '~/redux/user/userSlice'
+import { logOutAPI, updateUserAPI } from '../../components/redux/user/userSlice.js'
 
 function SecurityTab() {
   const dispatch = useDispatch()
   const { register, handleSubmit, watch, formState: { errors } } = useForm()
+  const navigate = useNavigate();
 
   // Ôn lại: https://www.npmjs.com/package/material-ui-confirm
   const confirmChangePassword = useConfirm()
@@ -36,12 +37,15 @@ function SecurityTab() {
       const { current_password, new_password } = data
 
       toast.promise(
-        // dispatch(updateUserAPI({ current_password, new_password })),
+        dispatch(updateUserAPI({ current_password, new_password })),
         { pending: 'Updating...' }
       ).then(res => {
         if (!res.error) {
           toast.success('Successfully changed your password,please login again')
-          dispatch(logOutAPI(false))
+          dispatch(logOutAPI(false)).then(() => {
+            navigate('/login');
+          });
+
         }
       })
 
@@ -92,7 +96,7 @@ function SecurityTab() {
                 })}
                 error={!!errors['current_password']}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'current_password'} /> */}
+              <FieldErrorAlert errors={errors} fieldName={'current_password'} />
             </Box>
 
             <Box>
@@ -117,7 +121,7 @@ function SecurityTab() {
                 })}
                 error={!!errors['new_password']}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'new_password'} /> */}
+              <FieldErrorAlert errors={errors} fieldName={'new_password'} />
             </Box>
 
             <Box>
@@ -141,7 +145,7 @@ function SecurityTab() {
                 })}
                 error={!!errors['new_password_confirmation']}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'new_password_confirmation'} /> */}
+              <FieldErrorAlert errors={errors} fieldName={'new_password_confirmation'} />
             </Box>
 
             <Box>

@@ -99,7 +99,8 @@ export const userSlice = createSlice({
     })
     builder.addCase(updateUserAPI.fulfilled, (state, action) => {
       const user = action.payload
-      state.currentUser = user
+      state.currentUser = { ...user } // ✅ tạo object mới
+      localStorage.setItem('currentUser', JSON.stringify(user))
     })
     builder.addCase(fetchAllUsers.fulfilled, (state, action) => {
       state.isLoading = false

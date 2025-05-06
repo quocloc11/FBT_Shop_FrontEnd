@@ -278,6 +278,8 @@ const CartPage = () => {
                       const simplifiedItems = cartItems.map(item => ({
                         productId: item.productId, // hoặc item.id nếu bạn lưu bằng key đó
                         quantity: item.quantity || 1,
+                        name: item.name,
+                        price: item.price
                       }));
 
                       setLoadingOrder(true); // bắt đầu loading

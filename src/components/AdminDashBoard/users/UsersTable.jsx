@@ -8,7 +8,7 @@ const UsersTable = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null); // For Edit
 	const [editForm, setEditForm] = useState({
-		name: '',
+		username: '',
 		email: '',
 		role: '',
 		isActive: true
@@ -28,7 +28,7 @@ const UsersTable = () => {
 	};
 
 	const filteredUsers = users.filter((user) =>
-		user.name.toLowerCase().includes(searchTerm) ||
+		user.username.toLowerCase().includes(searchTerm) ||
 		user.email.toLowerCase().includes(searchTerm)
 	);
 
@@ -37,7 +37,7 @@ const UsersTable = () => {
 		console.log('selectedUser', selectedUser)
 		setSelectedUser(user);
 		setEditForm({
-			name: user.name,
+			username: user.username,
 			email: user.email,
 			role: user.role,
 			isActive: user.isActive
@@ -46,16 +46,20 @@ const UsersTable = () => {
 
 	// Handle Save Edit
 	// Handle Save Edit
-	const handleSaveEdit = () => {
+	const handleSaveEdit = async () => {
 		if (selectedUser && selectedUser._id) {
-			console.log('Saving user with ID:', selectedUser._id);
-			dispatch(editUserAPI({ userId: selectedUser._id, data: editForm }));
-
-			setSelectedUser(null);
+			try {
+				await dispatch(editUserAPI({ userId: selectedUser._id, data: editForm })).unwrap();
+				dispatch(fetchAllUsers()); // Cập nhật lại danh sách người dùng
+				setSelectedUser(null);
+			} catch (error) {
+				console.error("Failed to update user:", error);
+			}
 		} else {
 			console.error("User ID is undefined. Cannot update user.");
 		}
 	};
+
 
 
 	// Handle Delete Action
@@ -114,12 +118,17 @@ const UsersTable = () => {
 									<td className="px-6 py-4 whitespace-nowrap">
 										<div className="flex items-center">
 											<div className="flex-shrink-0 h-10 w-10">
-												<div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-blue-500 flex items-center justify-center text-white font-semibold">
-													{user.name.charAt(0)}
+												<div className="h-10 w-10 rounded-full overflow-hidden">
+													<img
+														src={user.avatar || "/default-avatar.png"}
+														alt={user.username}
+														className="h-full w-full object-cover"
+													/>
 												</div>
+
 											</div>
 											<div className="ml-4">
-												<div className="text-sm font-medium text-gray-100">{user.name}</div>
+												<div className="text-sm font-medium text-gray-100">{user.username}</div>
 											</div>
 										</div>
 									</td>
@@ -171,12 +180,12 @@ const UsersTable = () => {
 				<div className="mt-6 p-4 bg-gray-700 rounded-lg">
 					<h3 className="text-xl font-semibold text-gray-100 mb-4">Edit User</h3>
 					<div className="mb-4">
-						<label htmlFor="name" className="text-sm text-gray-400">Name</label>
+						<label htmlFor="username" className="text-sm text-gray-400">Name</label>
 						<input
-							id="name"
+							id="username"
 							type="text"
-							value={editForm.name}
-							onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+							value={editForm.username}
+							onChange={(e) => setEditForm({ ...editForm, username: e.target.value })}
 							className="w-full bg-gray-600 text-white rounded-md p-2 mt-2"
 						/>
 					</div>

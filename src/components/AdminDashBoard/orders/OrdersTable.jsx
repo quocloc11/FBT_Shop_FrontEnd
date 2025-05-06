@@ -187,15 +187,17 @@ const OrdersTable = () => {
 						<table className="min-w-full text-sm text-gray-300">
 							<thead>
 								<tr>
-									<th className="px-4 py-2 text-left">Product ID</th>
+									<th className="px-4 py-2 text-left">Product Name</th>
 									<th className="px-4 py-2 text-left">Quantity</th>
+									<th className="px-4 py-2 text-left">Price</th>
 								</tr>
 							</thead>
 							<tbody>
 								{selectedOrder.items.map((item, index) => (
 									<tr key={index}>
-										<td className="px-4 py-2">{item.productId}</td>
+										<td className="px-4 py-2">{item.name}</td>
 										<td className="px-4 py-2">{item.quantity}</td>
+										<td className="px-4 py-2">{item.price}</td>
 									</tr>
 								))}
 							</tbody>
