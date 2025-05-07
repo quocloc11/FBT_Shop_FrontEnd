@@ -23,6 +23,7 @@ import AnalyticsPage from "./pages/DashBoard/AnalyticsPage";
 import SettingsPage from "./pages/DashBoard/SettingsPage";
 import AdminLayout from "./components/Layout/AdminLayout.jsx";
 import OrderSuccess from "./pages/PageOrder/OrderSuccess.jsx";
+import SearchPage from "./pages/SearchPage/SearchPage.jsx";
 
 // import Sidebar from "./components/AdminDashBoard/common/Sidebar.jsx";
 
@@ -56,6 +57,7 @@ const App = () => {
         <Route path="/:category" element={<ProductList />} />
         <Route path="/gio-hang" element={<CartPage />} />
         <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/search" element={<SearchPage />} />
 
         {/* onClick={() => navigate(`/${slugify(category.name)}`)} */}
         <Route path='/:category/:slug' element={<DetailProduct />} />

@@ -6,11 +6,11 @@ import EditProduct from "./EditProduct/EditProduct";
 import Modal from 'react-modal';  // import thư viện modal (hoặc sử dụng modal của bạn)
 // import { getProductAPI } from "../../redux/product/productSlice";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 const ProductsTable = () => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [products, setProducts] = useState([]);
-	const [filteredProducts, setFilteredProducts] = useState([]);
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false); // Trạng thái modal
@@ -36,9 +36,10 @@ const ProductsTable = () => {
 		const fetchProducts = async () => {
 			try {
 				//const resoponse=dispatch(getProductAPI())
-				const response = await getProductAPI(); // 🟢 Đổi URL thành API của bạn
+				const response = await getProductAPI();
+				console.log('Fetched products:', response.products);
+
 				setProducts(response.products); // Cập nhật state với dữ liệu từ API
-				setFilteredProducts(response.products);
 			} catch (error) {
 				console.error("Error fetching products:", error);
 			}
@@ -47,25 +48,6 @@ const ProductsTable = () => {
 		fetchProducts();
 	}, []);
 
-	// Xử lý tìm kiếm sản phẩm
-	useEffect(() => {
-		const filtered = products.filter((product) =>
-			product.name.toLowerCase().includes(searchTerm.toLowerCase())
-		);
-		setFilteredProducts(filtered);
-	}, [searchTerm, products]);
-
-	const handleSearch = (e) => {
-		const term = e.target.value.toLowerCase();
-		setSearchTerm(term);
-		setFilteredProducts(
-			products.filter(
-				(product) =>
-					product.name.toLowerCase().includes(term) ||
-					product.category.toLowerCase().includes(term)
-			)
-		);
-	};
 
 	const handleCreateProduct = async () => {
 		try {
@@ -89,12 +71,14 @@ const ProductsTable = () => {
 			const response = await createProductAPI(formData); // Đảm bảo hàm này sử dụng axios và không stringify dữ liệu
 
 			// Kiểm tra nếu API trả về dữ liệu thành công
-			if (response && response.data) {
-				const updatedProducts = [...products, response.data];
-				setProducts(updatedProducts);
-				setFilteredProducts(updatedProducts);
+			const product = response.data || response;
 
-				console.log("Modal status before closing:", showCreateModal);
+			if (product && product._id) {
+				// const updatedProducts = [...products, response.data];
+				// setProducts(updatedProducts);
+				setProducts((prevProducts) => [...prevProducts, product]);
+				toast.success("Tạo sản phẩm thành công!");
+
 				setShowCreateModal(false);
 
 				// Reset form
@@ -145,7 +129,6 @@ const ProductsTable = () => {
 			// Kiểm tra nếu sản phẩm xóa thành công, cập nhật lại danh sách sản phẩm
 			const updatedProducts = products.filter(p => p._id !== productToDelete);
 			setProducts(updatedProducts);
-			setFilteredProducts(updatedProducts);
 
 			// Đóng modal sau khi xóa thành công
 			setShowDeleteModal(false);
@@ -156,17 +139,9 @@ const ProductsTable = () => {
 			console.error("Error deleting product:", error);
 		}
 	};
-
-
-	const handleInputChange = (e) => {
-		const { name, value } = e.target;
-		setCurrentProduct({
-			...currentProduct,
-			[name]: name === "price" || name === "stock" || name === "quantity" || name === "promotion" ? parseFloat(value) : value
-		});
-	};
-
-	console.log('newProduct', newProduct)
+	const filteredProducts = products.filter(product =>
+		product.name.toLowerCase().includes(searchTerm.toLowerCase())
+	);
 	return (
 
 		<motion.div
@@ -190,8 +165,8 @@ const ProductsTable = () => {
 							type="text"
 							placeholder="Search products..."
 							className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-							onChange={handleSearch}
 							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
 						<Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
 					</div>
@@ -217,27 +192,27 @@ const ProductsTable = () => {
 					<tbody className="divide-y divide-gray-700">
 						{filteredProducts.map((product) => (
 							<motion.tr
-								key={product.id}
+								key={product?.id}
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								transition={{ duration: 0.3 }}
 							>
 								<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center">
 									<img
-										src={product.images}
+										src={product?.images}
 										alt="Product img"
 										className="w-10 h-10 rounded-full"
 									/>
-									{product.name}
+									{product?.name}
 								</td>
-								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.category}</td>
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product?.category}</td>
 								{/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.quantity}</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.promotion}</td>  */}
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-									{product.price.toFixed(2)} đ
+									{product?.price.toFixed(2)} đ
 								</td>
-								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.stock}</td>
-								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.quantity}</td>
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product?.stock}</td>
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product?.quantity}</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
 									<button
 										onClick={() => handleEditProduct(product)}
@@ -246,7 +221,7 @@ const ProductsTable = () => {
 										<Edit size={20} />
 									</button>
 									<button
-										onClick={() => handleDeleteClick(product._id)}
+										onClick={() => handleDeleteClick(product?._id)}
 
 										className="text-red-400 hover:text-red-300"
 									>
@@ -415,7 +390,6 @@ const ProductsTable = () => {
 				setCurrentProduct={setCurrentProduct}
 				//handleUpdateProduct={handleUpdateProduct}
 				setProducts={setProducts}
-				setFilteredProducts={setFilteredProducts}
 				products={products}
 			/>
 

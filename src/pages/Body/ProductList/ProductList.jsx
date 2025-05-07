@@ -94,37 +94,8 @@ const ProductList = () => {
         : [...prev.filter((v) => v !== "all"), value] // Thêm mới
     );
   };
-  // const filteredProducts = products.filter((product) => {
-  //   const price = product.price;
+  const uniqueBrands = [...new Set(products.map((product) => product.brand))];
 
-  //   const isInSliderRange = price >= priceRange[0] && price <= priceRange[1];
-
-  //   const matchesCheckbox = selectedPrices.length === 0 || selectedPrices.some((val) => {
-  //     if (val === "under_500") return price < 500000;
-  //     if (val === "500_1tr") return price >= 500000 && price <= 1000000;
-  //     if (val === "above_1tr") return price > 1000000;
-  //     return true;
-  //   });
-
-  //   const matchesBrand = !selectedBrand || selectedBrand === "" || product.brand === selectedBrand;
-
-  //   return isInSliderRange && matchesCheckbox && matchesBrand;
-  // });
-
-
-
-
-
-  // const filteredProducts = products
-  //   .filter((product) => (filterOs.length === 0 ? true : filterOs.includes(product.os)))
-  //   .filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
-  //   .filter(product => selectedBrand ? product.brand === selectedBrand : true)
-
-  //   .sort((a, b) => {
-  //     if (sortBy === "priceAsc") return a.price - b.price;
-  //     if (sortBy === "priceDesc") return b.price - a.price;
-  //     return 0;
-  //   });
   const filteredProducts = products
     .filter((product) => {
       const price = product.price;
@@ -152,9 +123,7 @@ const ProductList = () => {
     await addViewProductAPI(product); // Gọi API trước
     navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product }); // Sau đó chuyển trang
   };
-  // useEffect(() => {
-  //   setCurrentPage(1);
-  // }, [sortBy, priceRange, filterOs]);
+
 
   return (
     <>
@@ -285,11 +254,10 @@ const ProductList = () => {
                   label="Hãng Sản Xuất"
                 >
                   <MenuItem value=""><em>Tất cả</em></MenuItem>
-                  {products.map((product) => (
-                    <MenuItem key={product.id} value={product.brand}>
-                      {product.brand}
-                    </MenuItem>
+                  {uniqueBrands.map((brand, idx) => (
+                    <MenuItem key={idx} value={brand}>{brand}</MenuItem>
                   ))}
+
                 </Select>
               </FormControl>
 

@@ -116,6 +116,16 @@ export const deleteCommentsAPI = async (id, commentId) => {
   return response.data
 }
 
+// export const searchProductAPI = async (keyword) => {
+
+
+//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/products/search/${keyword}`);
+//   return response.data;
+// };
+export const searchProductAPI = async (keyword) => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/products/search/?keyword=${encodeURIComponent(keyword)}`);
+  return response.data;
+};
 
 // export const createCartProductAPI = async (product) => {
 //   const response = await authorizedAxiosInstance.post(`${API_ROOT}/cart`, product)

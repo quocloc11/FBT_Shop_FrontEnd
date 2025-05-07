@@ -7,15 +7,20 @@ import UsersTable from "../../components/AdminDashBoard/users/UsersTable.jsx";
 import UserGrowthChart from "../../components/AdminDashBoard/users/UserGrowthChart.jsx";
 import UserActivityHeatmap from "../../components/AdminDashBoard/users/UserActivityHeatmap.jsx";
 import UserDemographicsChart from "../../components/AdminDashBoard/users/UserDemographicsChart.jsx";
+import { useSelector } from "react-redux";
 
-const userStats = {
-	totalUsers: 152845,
-	newUsersToday: 243,
-	activeUsers: 98520,
-	churnRate: "2.4%",
-};
+
 
 const UsersPage = () => {
+
+	const users = useSelector((state) => state.user.users); // lấy từ Redux
+
+	const userStats = {
+		totalUsers: users.length,
+		newUsersToday: 243, // tùy xử lý thêm
+		activeUsers: 98520,
+		churnRate: "2.4%",
+	};
 	return (
 		<div className='flex-1 overflow-auto relative z-10'>
 			<Header title='Users' />

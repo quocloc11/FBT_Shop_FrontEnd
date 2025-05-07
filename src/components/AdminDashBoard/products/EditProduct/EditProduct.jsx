@@ -3,7 +3,7 @@ import { updatedProductAPI } from "../../../../apis"; // Đảm bảo API này �
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, currentProduct, setCurrentProduct, setFilteredProducts }) => {
+const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, currentProduct, setCurrentProduct }) => {
   // console.log('products', products)
 
   const [imagePreview, setImagePreview] = useState([]);
@@ -64,7 +64,6 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
       );
 
       setProducts(updatedProducts);
-      setFilteredProducts(updatedProducts);
       setShowEditModal(false);
       setCurrentProduct(null);
       toast.success("Product updated successfully!");

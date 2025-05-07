@@ -216,7 +216,7 @@ import { getProductAPI, updatedSaleProductAPI } from "../../../apis";
 const Sales = () => {
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
-  const [salePrice, setSalePrice] = useState(1000);
+  const [salePrice, setSalePrice] = useState('');
   const [startTime, setStartTime] = useState(dayjs());
   const [endTime, setEndTime] = useState(dayjs().add(1, 'hour'));
   const [stockLimit, setStockLimit] = useState(1);
@@ -227,8 +227,6 @@ const Sales = () => {
     const fetchProducts = async () => {
       try {
         const data = await getProductAPI();
-        console.log('data', data)
-        console.log("Products:", data.products);
         setProducts(data.products); // Cập nhật lại state products với dữ liệu lấy từ API
       } catch (err) {
         console.error("Lỗi khi lấy danh sách sản phẩm:", err);
@@ -237,7 +235,6 @@ const Sales = () => {
 
     fetchProducts(); // Gọi hàm fetchProducts khi component mount
   }, []); // Mảng phụ thuộc rỗng, tức là chỉ gọi một lần khi component mount
-  console.log('productsMap', products.map((product) => product.name));
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -257,9 +254,9 @@ const Sales = () => {
         await updatedSaleProductAPI(productId, payload); // Gửi yêu cầu cho từng sản phẩm
       }
       const data = await getProductAPI();
-      setProducts(data); // Cập nhật danh sách sản phẩm mới
+      setProducts(data.products); // Cập nhật danh sách sản phẩm mới
       setSelectedProducts([]); // Reset danh sách sản phẩm được chọn
-      setSalePrice(1000); // Reset giá sale
+      setSalePrice(''); // Reset giá sale
       setStartTime(dayjs()); // Reset thời gian bắt đầu
       setEndTime(dayjs().add(1, 'hour')); // Reset thời gian kết thúc
       setStockLimit(1); // Reset giới hạn số lượng
@@ -270,159 +267,7 @@ const Sales = () => {
     }
   };
 
-  // return (
-  //   <LocalizationProvider dateAdapter={AdapterDayjs}>
-  //     {/* FORM TẠO FLASH SALE */}
-  //     <Box
-  //       component="form"
-  //       onSubmit={handleSubmit}
-  //       sx={{
-  //         maxWidth: 600,
-  //         mx: "auto",
-  //         mt: 4,
-  //         p: 3,
-  //         border: "1px solid #ccc",
-  //         borderRadius: 2,
-  //         backgroundColor: "#fff",
-  //       }}
-  //     >
-  //       <Typography variant="h5" mb={2}>
-  //         Tạo Flash Sale
-  //       </Typography>
 
-  //       <Button
-  //         type="button"
-  //         variant="contained"
-  //         fullWidth
-  //         sx={{ mt: 3 }}
-  //         onClick={() => setShowProducts(true)}
-  //       >
-  //         Tạo Flash Sale
-  //       </Button>
-
-  //       {showProducts && (
-  //         <>
-  //           <FormControl fullWidth margin="normal">
-  //             <InputLabel>Chọn sản phẩm</InputLabel>
-  //             <Select
-  //               multiple
-  //               value={selectedProducts}
-  //               onChange={(e) => setSelectedProducts(e.target.value)}
-  //               input={<OutlinedInput label="Chọn sản phẩm" />}
-  //               fullWidth
-  //             >
-  //               {products.map((product) => (
-  //                 <MenuItem key={product._id} value={product._id}>
-  //                   {product.name}
-  //                 </MenuItem>
-  //               ))}
-  //             </Select>
-  //           </FormControl>
-
-  //           <TextField
-  //             label="Giá sale"
-  //             type="number"
-  //             fullWidth
-  //             margin="normal"
-  //             value={salePrice}
-  //             onChange={(e) => setSalePrice(Number(e.target.value))}
-  //             inputProps={{ min: 1000 }}
-  //           />
-
-  //           <DateTimePicker
-  //             label="Thời gian bắt đầu"
-  //             value={startTime}
-  //             onChange={(newValue) => setStartTime(newValue)}
-  //             renderInput={(params) => (
-  //               <TextField fullWidth margin="normal" {...params} />
-  //             )}
-  //           />
-
-  //           <DateTimePicker
-  //             label="Thời gian kết thúc"
-  //             value={endTime}
-  //             onChange={(newValue) => setEndTime(newValue)}
-  //             renderInput={(params) => (
-  //               <TextField fullWidth margin="normal" {...params} />
-  //             )}
-  //           />
-
-  //           <TextField
-  //             label="Số lượng giới hạn"
-  //             type="number"
-  //             fullWidth
-  //             margin="normal"
-  //             value={stockLimit}
-  //             onChange={(e) => setStockLimit(Number(e.target.value))}
-  //             inputProps={{ min: 1 }}
-  //           />
-
-  //           <FormControlLabel
-  //             control={
-  //               <Switch
-  //                 checked={isActive}
-  //                 onChange={(e) => setIsActive(e.target.checked)}
-  //               />
-  //             }
-  //             label="Kích hoạt Flash Sale"
-  //             sx={{ mt: 2 }}
-  //           />
-
-  //           <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
-  //             Tạo Flash Sale
-  //           </Button>
-  //         </>
-  //       )}
-  //     </Box>
-
-  //     {/* ✅ DANH SÁCH SẢN PHẨM FLASH SALE (tách riêng ngoài form) */}
-  //     <Box sx={{ mt: 6 }}>
-  //       <Typography variant="h6" mb={2}>
-  //         Danh sách sản phẩm đang Flash Sale
-  //       </Typography>
-  //       <table className="min-w-full divide-y divide-gray-700">
-  //         <thead>
-  //           <tr>
-  //             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-  //               Tên sản phẩm
-  //             </th>
-  //             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-  //               Giá
-  //             </th>
-  //             <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-  //               Số lượng
-  //             </th>
-  //           </tr>
-  //         </thead>
-  //         <tbody className="divide-y divide-gray-700">
-  //           {products.filter((p) => p.flashSale?.isActive).length > 0 ? (
-  //             products
-  //               .filter((p) => p.flashSale?.isActive)
-  //               .map((product) => (
-  //                 <tr key={product._id}>
-  //                   <td className="px-6 py-4 text-sm text-gray-300">
-  //                     {product.name}
-  //                   </td>
-  //                   <td className="px-6 py-4 text-sm text-gray-300">
-  //                     {product.price.toLocaleString()} VND
-  //                   </td>
-  //                   <td className="px-6 py-4 text-sm text-gray-300">
-  //                     {product.stock}
-  //                   </td>
-  //                 </tr>
-  //               ))
-  //           ) : (
-  //             <tr>
-  //               <td colSpan="3" className="text-center py-4 text-gray-400">
-  //                 Không có sản phẩm đang chạy Flash Sale
-  //               </td>
-  //             </tr>
-  //           )}
-  //         </tbody>
-  //       </table>
-  //     </Box>
-  //   </LocalizationProvider>
-  // );
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       {/* FORM TẠO FLASH SALE */}
@@ -478,7 +323,7 @@ const Sales = () => {
               margin="normal"
               value={salePrice}
               onChange={(e) => setSalePrice(Number(e.target.value))}
-              inputProps={{ min: 1000 }}
+
             />
 
             <DateTimePicker

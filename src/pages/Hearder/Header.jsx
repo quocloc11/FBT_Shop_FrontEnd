@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { FaShoppingCart, FaBars, FaUser } from "react-icons/fa";
-import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer, Badge } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer, Badge, CircularProgress } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { Search, ShoppingCart } from "@mui/icons-material";
+import { Clear, Search, ShoppingCart } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Profiles from "../../components/Profiles/Profiles";
 import { useNavigate } from "react-router-dom";
@@ -19,9 +19,14 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import slugify from 'slugify';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import { useSelector } from "react-redux";
 import { selectOrders } from "../../components/redux/order/orderSlice";
 import { selectCartItems } from "../../components/redux/cart/cartSlice";
+import { searchProductAPI } from "../../apis";
 const categories = [
   { icon: <TvIcon />, label: "Tivi, Tủ lạnh, Máy lạnh - Điều hòa" },
   { icon: <LocalLaundryServiceIcon />, label: "Máy giặt, Máy sấy, Tủ sấy" },
@@ -50,9 +55,18 @@ const Header = () => {
 
   const [open, setOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const carts = useSelector(selectCartItems);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [searchHistory, setSearchHistory] = useState(() => {
+    const stored = localStorage.getItem('searchHistory');
+    return stored ? JSON.parse(stored) : [];
+  });
   const cartCount = carts?.items?.length
   const handleMouseEnter = () => {
     setOpen(true);
@@ -69,7 +83,53 @@ const Header = () => {
   const navigate = useNavigate();
   // Hiển thị menu khi di chuột vào
 
+  // Xử lý khi người dùng thay đổi ô tìm kiếm
+  const handleInputChange = (e) => {
+    const keyword = e.target.value;
+    setSearchQuery(keyword);
 
+    // Nếu có từ khóa, bắt đầu tìm kiếm gợi ý
+    if (keyword) {
+      fetchSearchSuggestions(keyword);
+    } else {
+      setSuggestions([]); // Nếu không có từ khóa, xóa gợi ý
+    }
+  };
+
+  // Hàm tìm kiếm sản phẩm gợi ý
+  const fetchSearchSuggestions = async (keyword) => {
+    setLoading(true);
+    try {
+      const result = await searchProductAPI(keyword); // Gọi API tìm kiếm sản phẩm
+      setSuggestions(result.products); // Giả sử kết quả trả về là một mảng sản phẩm gợi ý
+    } catch (error) {
+      console.error('Lỗi khi tìm kiếm sản phẩm:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Xử lý khi nhấn "Search"
+  // const handleSearch = () => {
+  //   navigate(`/search?keyword=${searchQuery.trim()}`);
+  // };
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+
+    // Lưu lịch sử (tối đa 5 mục, không trùng lặp)
+    const updatedHistory = [searchQuery, ...searchHistory.filter(q => q !== searchQuery)].slice(0, 5);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+    setSearchHistory(updatedHistory);
+    navigate(`/search?keyword=${searchQuery.trim()}`);
+    // Gọi API tìm kiếm sản phẩm nếu cần
+  };
+  const handleDeleteHistoryItem = (itemToDelete) => {
+    const updatedHistory = searchHistory.filter(item => item !== itemToDelete);
+    setSearchHistory(updatedHistory);
+    localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
+  };
+
+  console.log('suggestions', suggestions)
   return (
     <Box sx={{ backgroundColor: '#cb1c22', color: 'white', px: 8, py: 1, position: 'relative' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -167,30 +227,137 @@ const Header = () => {
           </Box>
 
           {/* Thanh tìm kiếm */}
-          <TextField
-            fullWidth
-            placeholder="Nhập tên điện thoại, máy tính, phụ kiện... cần tìm"
-            variant="outlined"
-            sx={{
-              backgroundColor: 'white',
-              ml: 2,
-              width: '600px',
-              height: '43px',
-              borderRadius: '50px',
-              '& fieldset': { border: 'none' },
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton>
-                    <Search />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+          <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Thanh tìm kiếm */}
+            <TextField
+              autoComplete="off"
+              value={searchQuery}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearch();
+              }}
+              onFocus={() => setShowDropdown(true)}  // Hiển thị dropdown khi focus vào ô tìm kiếm
+              onBlur={() => setTimeout(() => setShowDropdown(false), 100)}  // Đảm bảo dropdown ẩn đi sau một khoảng thời gian (để không bị ẩn ngay khi click)
+              placeholder="Nhập tên sản phẩm..."
+              variant="outlined"
+              sx={{
+                backgroundColor: 'white',
+                width: '600px',
+                borderRadius: '50px',
+                '& fieldset': { border: 'none' },
+              }}
+              InputProps={{
+                sx: {
+                  height: '43px',
+                  borderRadius: '50px',
+                  paddingRight: '8px',
+                  paddingLeft: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                },
+                endAdornment: (
+                  <>
+                    {searchQuery && (
+                      <InputAdornment position="end">
+                        <IconButton onClick={() => setSearchQuery('')}>
+                          <Clear />
+                        </IconButton>
+                      </InputAdornment>
+                    )}
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleSearch}>
+                        <Search />
+                      </IconButton>
+                    </InputAdornment>
+                  </>
+                ),
+              }}
+            />
+
+            {/* Hiển thị danh sách gợi ý */}
+            {showDropdown && (suggestions.length > 0 || searchHistory.length > 0) && (
+              <div style={{
+                position: 'absolute',
+                top: '60px',
+                left: 0,
+                width: '600px',
+                backgroundColor: 'white',
+                borderRadius: '10px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                zIndex: 999,
+              }}>
+                <ul style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
+                  {suggestions.length > 0 ? (
+                    suggestions.map((product, index) => (
+                      <li key={index} style={{ padding: '10px', borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
+                        onMouseDown={() => navigate(`/${slugify(product.category)}/${slugify(product.name)}`, { state: product })}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <img src={product.images} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px' }} />
+                          <div>
+                            <div style={{ color: '#ff0000' }}>{product.name}</div>
+                            <div style={{ color: '#ff0000' }}>{product.price} VND</div>
+                          </div>
+                        </div>
+                      </li>
+                    ))
+                  ) : (
+                    searchHistory.map((item, index) => (
+                      <li key={index} style={{
+                        padding: '10px',
+                        borderBottom: '1px solid #f0f0f0',
+                        cursor: 'pointer',
+                        color: '#555',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                        <span onMouseDown={() => {
+                          setSearchQuery(item);
+                          handleSearch();
+                        }}>
+                          🔍 {item}
+                        </span>
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation(); // Tránh việc click vào span cha
+                            handleDeleteHistoryItem(item);
+                          }}
+                          style={{
+                            marginLeft: '10px',
+                            color: '#ff0000',  // Đặt màu đỏ để nổi bật hơn
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '20px', // Tăng kích thước để dễ nhìn
+                          }}
+                        >
+                          <IconButton
+                            sx={{
+                              padding: '0',
+                              color: '#ff0000',  // Đảm bảo màu icon là màu đỏ
+                              '&:hover': {
+                                backgroundColor: 'transparent', // Tạo hiệu ứng hover mượt mà
+                              },
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Tránh việc click vào span cha
+                              handleDeleteHistoryItem(item);
+                            }}
+                          >
+                            <DeleteIcon /> {/* Thay thế '×' bằng biểu tượng xóa */}
+                          </IconButton>
+                        </span>
+
+
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+            )}
+          </Box>
+
+
+
         </Box>
 
         {/* Giỏ hàng */}

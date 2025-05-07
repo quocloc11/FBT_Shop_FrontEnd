@@ -107,11 +107,9 @@ const BodyProduct = () => {
               >
                 <CardMedia
                   component="img"
-                  height="140"
                   image={product.images}
                   alt={product.title}
                   sx={{
-                    height: 140,
                     objectFit: "cover",
                     width: "100%",
                     borderRadius: "4px",
@@ -124,9 +122,9 @@ const BodyProduct = () => {
                 />
 
                 <CardContent>
-                  <Typography variant="subtitle2" color="error">
+                  {/* <Typography variant="subtitle2" color="error">
                     {product.promotion}
-                  </Typography>
+                  </Typography> */}
                   <Typography
                     variant="body2"
                     sx={{ textDecoration: "line-through", color: "gray" }}
