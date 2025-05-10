@@ -26,6 +26,7 @@ import { Link } from 'react-router-dom';
 
 import { logOutAPI, selectCurrentUser } from '../redux/user/userSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { clearCart } from '../redux/cart/cartSlice';
 
 function Profiles() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -53,8 +54,10 @@ function Profiles() {
       .then(() => {
         dispatch(logOutAPI())
           .then(() => {
+            // ✅ Xóa giỏ hàng sau khi logout thành công
+            dispatch(clearCart());
             console.log('Logout thành công!');
-            navigate('/login'); // ✅ Điều hướng sang trang login
+            navigate('/login'); // Điều hướng sang trang login
           })
           .catch((error) => {
             console.error('Lỗi khi logout:', error);
@@ -64,6 +67,7 @@ function Profiles() {
         console.log('Hủy logout');
       });
   };
+
 
   return (
     <Box>

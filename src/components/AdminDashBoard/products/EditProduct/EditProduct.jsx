@@ -12,6 +12,7 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
     category: "",
     price: 0,
     stock: 0,
+    discountPrice: 0,
     description: "",
     video: "",
     promotion: "",
@@ -80,7 +81,7 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
     const { name, value } = e.target;
 
     // Chuyển các trường price, stock, quantity thành số
-    if (name === "price" || name === "stock" || name === "quantity") {
+    if (name === "price" || name === "discountPrice" || name === "stock" || name === "quantity") {
       const numericValue = value === "" ? 0 : parseFloat(value);
       setNewProduct((prev) => ({ ...prev, [name]: numericValue }));
     } else {
@@ -165,7 +166,17 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
                   required
                 />
               </div>
-
+              <div>
+                <label className="text-sm text-gray-300">Price</label>
+                <input
+                  type="number"
+                  name="discountPrice"
+                  className="w-full p-2 mt-1 bg-gray-700 text-gray-300 rounded-lg border border-gray-600"
+                  value={newProduct.discountPrice}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
               {/* Stock */}
               <div>
                 <label className="text-sm text-gray-300">Stock</label>

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
   Container, Grid, ListItem, List, ListItemAvatar,
   Typography, Button, Box, Card, CardMedia, Chip, Breadcrumbs,
-  TextField, Divider, Rating, ListItemText, Avatar, CardContent
+  TextField, Divider, Rating, ListItemText, Avatar, CardContent,
+  Paper
 } from "@mui/material";
 import Header from "../../Hearder/Header";
 import CategoryMenu from "../../CategoryMenu/CategoryMenu";
@@ -11,7 +12,7 @@ import Footer from "../../Footer/Footer";
 import { useLocation } from 'react-router-dom';
 import { ShoppingCartIcon } from "lucide-react";
 import { addCommentsAPI, getCommentsAPI } from "../../../apis";
-import { userSlice } from "../../../components/redux/user/userSlice";
+import { selectCurrentUser, userSlice } from "../../../components/redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import moment from 'moment';
 import { createCartProductAPI, getCartProductAPI } from "../../../components/redux/cart/cartSlice";
@@ -22,21 +23,19 @@ const DetailProduct = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
-  const [reviews, setReviews] = useState(product);
+  const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState('');
   const [newRating, setNewRating] = useState(0);
   const dispatch = useDispatch();
-  console.log('product', product)
 
-  const currentUser = useSelector((state) => state.user.currentUser);
-
-
+  //const currentUser = useSelector((state) => state.user.currentUser);
+  const currentUser = useSelector(selectCurrentUser)
+  console.log('currentUser', currentUser)
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const data = await getCommentsAPI(product._id); // Lấy bình luận từ API bằng product._id
         console.log('comments:', data);
-        // Cập nhật lại reviews
         setReviews(Array.isArray(data) ? data : []); // Giả sử data là một mảng bình luận
       } catch (error) {
         console.error('Lỗi khi lấy bình luận:', error);
@@ -82,13 +81,21 @@ const DetailProduct = () => {
   const navigate = useNavigate();
 
   const handleCartProduct = (product) => {
+
+    const priceAfterDiscount =
+      product.discountPrice && product.discountPrice < product.price
+        ? product.price - product.discountPrice
+        : product.price;
+
     // Lọc ra các thuộc tính cần thiết
     const productData = {
       productId: product._id,
       quantity: 1,
-      price: product.price,
+      price: priceAfterDiscount,
       name: product.name,
-      images: product.images
+      images: product.images,
+      originalPrice: product.price,
+      promotion: product.promotion
     };
 
     dispatch(createCartProductAPI(productData))
@@ -102,36 +109,48 @@ const DetailProduct = () => {
         toast.error("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.");
       });
   };
+
+  // const avgRating =
+  //   reviews.length > 0
+  //     ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
+  //     : 0;
+  const reviewComments = reviews.filter(r => r.rating !== undefined && r.rating !== null);
+  const avgRating = reviewComments.length > 0
+    ? reviewComments.reduce((sum, r) => sum + r.rating, 0) / reviewComments.length
+    : 0;
+  const totalComments = reviews.length;
+
   return (
     <>
       <Header />
-      <Container maxWidth="lg" >
+      <Container maxWidth="lg">
         <CategoryMenu />
-        <Breadcrumbs aria-label="breadcrumb" sx={{ mt: 1 }}>
-          <Button
-            onClick={() => navigate("/")}
-            sx={{ cursor: "pointer", color: "blue", "&:hover": { textDecoration: "underline" } }}
-          >
-            Trang chủ
-          </Button>
-          <Button
-            onClick={() => navigate("/dien-thoai")}
-            sx={{ cursor: "pointer", color: "blue", "&:hover": { textDecoration: "underline" } }}
-          >
-            Điện thoại
-          </Button>
-          <Button color="textPrimary">Iphone 16</Button>
+
+        {/* Breadcrumbs */}
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mt: 2, mb: 3 }}>
+          <Button onClick={() => navigate("/")} sx={{ color: "primary.main" }}>Trang chủ</Button>
+          <Button onClick={() => navigate("/dien-thoai")} sx={{ color: "primary.main" }}>Điện thoại</Button>
+          <Typography color="text.primary">Iphone 16</Typography>
         </Breadcrumbs>
-        <Grid container spacing={4} sx={{ mt: 1 }}>
-          {/* Hình ảnh sản phẩm */}
+
+        {/* Phần chính */}
+        <Grid container spacing={4}>
+          {/* Hình ảnh */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ boxShadow: 3 }}>
               <CardMedia
                 component="img"
                 image={product.images}
                 alt="Samsung Galaxy S24 FE"
-                sx={{ height: 400 }}
+                sx={{
+                  height: 400,
+                  objectFit: "contain", // Hoặc 'cover' nếu bạn muốn căng hết
+                  width: "100%",
+                  backgroundColor: "#f5f5f5", // nền sáng cho ảnh rõ hơn
+                  borderRadius: 2,
+                }}
               />
+
             </Card>
             <Box display="flex" justifyContent="center" mt={2}>
               {[1, 2, 3, 4, 5].map((_, index) => (
@@ -139,8 +158,8 @@ const DetailProduct = () => {
                   key={index}
                   component="img"
                   image={product.images}
-                  alt="Thumbnail"
-                  sx={{ width: 60, height: 60, mx: 1, cursor: "pointer" }}
+                  alt={`Thumbnail ${index}`}
+                  sx={{ width: 60, height: 60, mx: 1, cursor: "pointer", borderRadius: 1, boxShadow: 1 }}
                 />
               ))}
             </Box>
@@ -148,158 +167,209 @@ const DetailProduct = () => {
 
           {/* Thông tin sản phẩm */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h5" fontWeight="bold">
-              {product.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" >
-              No.00911818 | ⭐ 4.2 | 13 đánh giá | 36 bình luận
-            </Typography>
-
-            {/* Giá sản phẩm */}
-            <Box mt={3}>
-              <Typography variant="h4" color="error" fontWeight="bold">
-                {product.price} ₫
+            <Typography variant="h5" fontWeight="bold" gutterBottom>{product.name}</Typography>
+            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mb={1}>
+              <Typography variant="body2" color="text.secondary">
+                No.00911818
               </Typography>
-              <Typography variant="body1" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
-                {product.price}
+
+              <Chip
+                icon={<span style={{ fontSize: '1rem' }}>⭐</span>}
+                label={`${avgRating.toFixed(1)} điểm`}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+
+              <Chip
+                label={`${reviewComments.length} đánh giá`}
+                size="small"
+                color="default"
+                variant="outlined"
+              />
+
+              <Chip
+                label={`${totalComments} bình luận`}
+                size="small"
+                color="default"
+                variant="outlined"
+              />
+            </Box>
+
+
+
+            {/* Giá */}
+            <Box mt={3}>
+              <Typography sx={{ textDecoration: "line-through", color: "text.secondary" }}>
+                {Number(product.price).toLocaleString("vi-VN")} đ
+              </Typography>
+              <Typography variant="h4" color="error" fontWeight="bold">
+                {Number(product.priceAfterDiscount).toLocaleString("vi-VN")} đ
               </Typography>
             </Box>
 
-            <Box mt={4} display="flex" justifyContent="center">
+            {/* Mua ngay */}
+            <Box mt={4}>
               <Button
                 variant="contained"
                 color="error"
-                size="small"
                 startIcon={<ShoppingCartIcon />}
-                sx={{
-                  borderRadius: 2,
-                  fontWeight: 'bold',
-                  textTransform: 'none',
-                  px: 3, // padding ngang
-                  py: 1, // padding dọc
-                  minWidth: 'auto', // không bị kéo dài không cần thiết
-                }}
+                sx={{ borderRadius: 2, textTransform: 'none', px: 4, py: 1 }}
                 onClick={() => handleCartProduct(product)}
               >
                 Mua ngay
               </Button>
             </Box>
 
+            {/* Khuyến mãi */}
             <Box mt={4}>
-              <Button size="large" >
+              <Button variant="outlined" color="primary" size="small">
                 Khuyến mãi nổi bật
               </Button>
-              <Typography variant="body1" sx={{ textDecoration: "line-through", color: "text.secondary" }}>
+              <Typography variant="body1" color="text.secondary">
                 {product.promotion}
               </Typography>
             </Box>
           </Grid>
         </Grid>
 
-        {/* Thông số kỹ thuật */}
-        <Grid container spacing={2} mt={4}>
-          {/* Thông số & Mô tả */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Box>
-              <Typography variant="h6" fontWeight="bold">Thông số nổi bật</Typography>
-              <Box mt={2}>
-                <Typography variant="body1">{product.specs}</Typography>
-              </Box>
+        <Box sx={{ border: "1px solid", borderColor: "grey.300", borderRadius: 2 }}>
 
-            </Box>
+          {/* Thông số kỹ thuật */}
+          <Grid container spacing={3} mt={5}>
+            {/* Cột bên trái: Thông số + Mô tả */}
+            <Grid item xs={12} sm={6} md={8}>
+              <Grid container spacing={3}>
+                {/* Thông số nổi bật */}
+                <Grid item xs={12}>
+                  <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+                    <Typography variant="h6" fontWeight="bold">Thông số nổi bật</Typography>
+                    <Box mt={1}>
+                      <Typography variant="body1">{product.specs}</Typography>
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* Mô tả sản phẩm */}
+                <Grid item xs={12}>
+                  <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+                    <Typography variant="h6" fontWeight="bold">Mô tả sản phẩm</Typography>
+                    <Typography variant="body1">{product.description}</Typography>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* Cột bên phải: Video */}
+            <Grid item xs={12} sm={6} md={4}>
+              <Card sx={{ p: 2, borderRadius: 2, height: '100%' }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>Video Sản phẩm</Typography>
+                <CardMedia component="iframe" src={product.video} height="100%" style={{ minHeight: 350 }} />
+              </Card>
+            </Grid>
           </Grid>
 
-          {/* Video sản phẩm */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <Typography variant="h6" sx={{ p: 2 }}>
-                Video Sản phẩm
-              </Typography>
-              <CardMedia
-                component="iframe"
-                src={product.video}
-                height="200"
-              />
-
-            </Card>
-          </Grid>
-
-          {/* Phần thứ 3 (tuỳ bạn muốn thêm gì ở đây) */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Box>
-              <Typography variant="h6" fontWeight="bold" mt={2}>Mô Tả Sản Phẩm</Typography>
-              <Typography variant="body1">{product.description}</Typography>
-            </Box>
-          </Grid>
-        </Grid>
-
-
-        <Box sx={{ maxWidth: 600, margin: '0 auto', padding: 2 }}>
-          <Typography variant="h5">Khách hàng nói về sản phẩm</Typography>
-          <Typography variant="h6" sx={{ marginBottom: 2 }}>
-            4.4
+        </Box>
+        {/* Bình luận */}
+        <Box
+          sx={{
+            width: "100%",             // Chiếm toàn bộ chiều ngang
+            maxWidth: "1200px",        // Tùy kích thước bạn muốn, ví dụ 1200px
+            mx: "auto",                // Căn giữa
+            mt: 6,
+            p: 3,
+            bgcolor: "background.paper",
+            borderRadius: 3,
+            boxShadow: 2,
+          }}
+        >
+          {/* Tổng quan */}
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            Khách hàng nói gì về sản phẩm
           </Typography>
-          <Rating value={4.4} readOnly precision={0.1} />
-          <Typography variant="subtitle1" sx={{ marginBottom: 2 }}>
-            {reviews.length} Bình luận
-          </Typography>
 
-          <Divider sx={{ margin: '20px 0' }} />
+          <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <Typography variant="h4" fontWeight="bold" color="primary">
+              {avgRating.toFixed(1)}
+            </Typography>
+            <Rating value={avgRating} readOnly precision={0.1} size="large" />
+            <Typography variant="body1" color="text.secondary">
+              ({Array.isArray(reviews) ? reviews.length : 0} đánh giá)
+            </Typography>
+          </Box>
 
-          <TextField
-            label="Nhập nội dung bình luận"
-            multiline
-            rows={4}
-            variant="outlined"
-            fullWidth
-            value={newReview}
-            onChange={(e) => setNewReview(e.target.value)}
-            sx={{ marginBottom: 2 }}
-          />
-          <Rating
-            name="simple-controlled"
-            value={newRating}
-            onChange={(event, newValue) => {
-              setNewRating(newValue);
-            }}
-          />
-          <Button variant="contained" onClick={handleSubmit} sx={{ marginTop: 2 }}>
-            Gửi bình luận
-          </Button>
+          <Divider sx={{ my: 3 }} />
 
-          <Divider sx={{ margin: '20px 0' }} />
+          {/* Viết bình luận */}
+          <Box mb={4}>
+            <Typography variant="h6" gutterBottom>
+              Viết bình luận của bạn
+            </Typography>
 
-          <List>
-            {Array.isArray(reviews) && reviews.map((review, index) => (
-              <ListItem key={index} alignItems="flex-start">
-                <ListItemAvatar>
-                  <Avatar>{review.username.charAt(0)}</Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={
-                    <>
-                      <Typography variant="subtitle2">{review.username}</Typography>
+            <TextField
+              label="Nội dung bình luận"
+              multiline
+              rows={4}
+              fullWidth
+              value={newReview}
+              onChange={(e) => setNewReview(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+
+            <Rating
+              name="rating"
+              value={newRating}
+              onChange={(e, newValue) => setNewRating(newValue || 0)} // Nếu không có giá trị, đặt là 0
+              size="large"
+            />
+
+
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              sx={{ mt: 2, px: 4 }}
+            >
+              Gửi bình luận
+            </Button>
+          </Box>
+
+          <Divider sx={{ mb: 3 }} />
+
+          {/* Danh sách bình luận */}
+          <Grid container spacing={2}>
+            {Array.isArray(reviews) &&
+              reviews.map((review, index) => (
+                <Grid item xs={12} key={index}>
+                  <Paper
+                    elevation={1}
+                    sx={{ p: 2, borderRadius: 2, display: "flex", gap: 2 }}
+                  >
+
+                    <Avatar alt={currentUser?.username} src={currentUser?.avatar} />
+
+                    <Box>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          {review.username}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {moment(review.createdAt).fromNow()}
+                        </Typography>
+                      </Box>
+
                       <Rating value={review.rating || 0} readOnly size="small" />
-                    </>
-                  }
-                  secondary={
-                    <>
-                      <Typography variant="body2" color="text.primary">
+
+                      <Typography variant="body2" mt={1}>
                         {review.content}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {moment(review.createdAt).fromNow()} {/* Hiển thị thời gian cách đây */}
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
+                    </Box>
+                  </Paper>
+                </Grid>
+              ))}
+          </Grid>
         </Box>
-
-
       </Container>
+
       <Footer />
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaShoppingCart, FaBars, FaUser } from "react-icons/fa";
 import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer, Badge, CircularProgress } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -22,55 +22,67 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import slugify from 'slugify';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import SmartphoneIcon from '@mui/icons-material/Smartphone';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import HeadphonesIcon from '@mui/icons-material/Headphones';
+import AcUnitIcon from '@mui/icons-material/AcUnit'; // máy lạnh
+import SimCardIcon from '@mui/icons-material/SimCard';
+import DevicesOtherIcon from '@mui/icons-material/DevicesOther'; // fallback
+import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import { useSelector } from "react-redux";
 import { selectOrders } from "../../components/redux/order/orderSlice";
 import { selectCartItems } from "../../components/redux/cart/cartSlice";
-import { searchProductAPI } from "../../apis";
-const categories = [
-  { icon: <TvIcon />, label: "Tivi, Tủ lạnh, Máy lạnh - Điều hòa" },
-  { icon: <LocalLaundryServiceIcon />, label: "Máy giặt, Máy sấy, Tủ sấy" },
-  { icon: <ComputerIcon />, label: "PC, Màn hình, Đồng hồ, Máy tính bảng" },
-  { icon: <ToysIcon />, label: "Quạt, Quạt điều hòa, Máy lọc nước" },
-  { icon: <CleaningServicesIcon />, label: "Robot hút bụi, Máy hút bụi" },
-  { icon: <PrintIcon />, label: "Máy in, Phần mềm, Linh kiện" },
-  { icon: <KitchenIcon />, label: "Ấm siêu tốc, Nồi cơm điện" },
-  { icon: <PowerIcon />, label: "Điện gia dụng, Máy ép" },
-  { icon: <RestaurantIcon />, label: "Thiết bị bếp, Nồi, Chảo" },
-  { icon: <LocalFireDepartmentIcon />, label: "Hút ẩm, Máy sưởi" },
-  { icon: <FavoriteIcon />, label: "Chăm sóc sức khỏe" },
-  { icon: <CameraAltIcon />, label: "Camera, Thiết bị mạng" },
-];
+import { getProductAPI, searchProductAPI } from "../../apis";
+import { LaptopIcon } from "lucide-react";
+// const categories = [
+//   { icon: <TvIcon />, label: "Tivi, Tủ lạnh, Máy lạnh - Điều hòa" },
+//   { icon: <LocalLaundryServiceIcon />, label: "Máy giặt, Máy sấy, Tủ sấy" },
+//   { icon: <ComputerIcon />, label: "PC, Màn hình, Đồng hồ, Máy tính bảng" },
+//   { icon: <ToysIcon />, label: "Quạt, Quạt điều hòa, Máy lọc nước" },
+//   { icon: <CleaningServicesIcon />, label: "Robot hút bụi, Máy hút bụi" },
+//   { icon: <PrintIcon />, label: "Máy in, Phần mềm, Linh kiện" },
+//   { icon: <KitchenIcon />, label: "Ấm siêu tốc, Nồi cơm điện" },
+//   { icon: <PowerIcon />, label: "Điện gia dụng, Máy ép" },
+//   { icon: <RestaurantIcon />, label: "Thiết bị bếp, Nồi, Chảo" },
+//   { icon: <LocalFireDepartmentIcon />, label: "Hút ẩm, Máy sưởi" },
+//   { icon: <FavoriteIcon />, label: "Chăm sóc sức khỏe" },
+//   { icon: <CameraAltIcon />, label: "Camera, Thiết bị mạng" },
+// ];
 
-const phoneBrands = {
-  Apple: ["iPhone 16 Series", "iPhone 15 Series", "iPhone 14 Series"],
-  Samsung: ["Galaxy A", "Galaxy S", "Galaxy Z", "Galaxy M"],
-  Xiaomi: ["Poco Series", "Redmi Note", "Redmi Series"],
-  OPPO: ["Reno Series", "A Series", "Find Series"],
-  Khác: ["Realme", "Vivo", "Nokia", "Itel"],
-};
 
 
 const Header = () => {
+  const [categories, setCategories] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [products, setProducts] = useState([]);
 
   const carts = useSelector(selectCartItems);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
 
   const [searchHistory, setSearchHistory] = useState(() => {
     const stored = localStorage.getItem('searchHistory');
     return stored ? JSON.parse(stored) : [];
   });
-  const cartCount = carts?.items?.length
+  const cartCount = carts?.length
   const handleMouseEnter = () => {
     setOpen(true);
     setIsHovering(true);
+  };
+  const categoryMap = {
+    "dien-thoai": { label: "Điện Thoại", icon: <PhoneIphoneIcon /> },
+    "laptop": { label: "Laptop", icon: <LaptopIcon /> },
+    "tu-lanh": { label: "Tủ Lạnh", icon: <AcUnitIcon /> },
+    "may-lanh": { label: "Máy Lạnh", icon: <AcUnitIcon /> },
+    "sim-fpt": { label: "Sim FPT", icon: <SimCardIcon /> },
+    "phu-kien": { label: "Phụ Kiện", icon: <HeadphonesIcon /> },
+    "quat-dieu-hoa": { label: "Quạt Điều Hòa", icon: <AcUnitIcon /> }
   };
 
   const handleMouseLeave = () => {
@@ -79,6 +91,62 @@ const Header = () => {
     setOpen(false);
 
   };
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const data = await getProductAPI();
+  //       setProducts(data.products); // Lưu toàn bộ sản phẩm
+  //       const uniqueCategoryMap = {};
+
+  //       data.products.forEach(product => {
+  //         const category = product.category?.trim();
+  //         if (category && !uniqueCategoryMap[category]) {
+  //           uniqueCategoryMap[category] = {
+  //             label: category,
+
+  //           };
+  //         }
+  //       });
+
+  //       setCategories(Object.values(uniqueCategoryMap)); // chỉ giữ mỗi danh mục 1 lần
+  //     } catch (err) {
+  //       console.error("Lỗi khi lấy danh sách sản phẩm:", err);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, []);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProductAPI();
+        setProducts(data.products);
+
+        const uniqueCategoryMap = {};
+
+        data.products.forEach(product => {
+          const categoryKey = product.category?.trim();
+          if (categoryKey && !uniqueCategoryMap[categoryKey]) {
+            const mapItem = categoryMap[categoryKey] || {};
+            uniqueCategoryMap[categoryKey] = {
+              value: categoryKey,
+              label: mapItem.label || categoryKey, // fallback nếu không có trong map
+              icon: mapItem.icon || <HeadphonesIcon />
+            };
+          }
+        });
+
+        setCategories(Object.values(uniqueCategoryMap));
+      } catch (err) {
+        console.error("Lỗi khi lấy danh sách sản phẩm:", err);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const filteredProducts = products.filter(p => p.category === hoveredCategory);
+
   //const cartCount = 4;
   const navigate = useNavigate();
   // Hiển thị menu khi di chuột vào
@@ -124,12 +192,23 @@ const Header = () => {
     // Gọi API tìm kiếm sản phẩm nếu cần
   };
   const handleDeleteHistoryItem = (itemToDelete) => {
+    console.log("Deleting: ", itemToDelete);
     const updatedHistory = searchHistory.filter(item => item !== itemToDelete);
     setSearchHistory(updatedHistory);
     localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
 
-  console.log('suggestions', suggestions)
+
+
+
+  const groupedProducts = filteredProducts.reduce((acc, product) => {
+    const brand = product.brand || "Unknown"; // Nếu không có thương hiệu thì cho là "Unknown"
+    if (!acc[brand]) {
+      acc[brand] = [];
+    }
+    acc[brand].push(product);
+    return acc;
+  }, {});
   return (
     <Box sx={{ backgroundColor: '#cb1c22', color: 'white', px: 8, py: 1, position: 'relative' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -145,7 +224,7 @@ const Header = () => {
           <Box
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            sx={{ position: 'relative' }}
+            sx={{ position: 'relative', display: 'flex' }}
           >
             <Button
               variant="contained"
@@ -166,69 +245,122 @@ const Header = () => {
               <Box
                 sx={{
                   position: "absolute",
-                  top: 50,
+                  top: 44,
                   left: 0,
                   display: "flex",
+                  borderRadius: '15px',
+                  overflow: 'hidden',
+                  backgroundColor: '#333',
+                  boxShadow: 3,
                   zIndex: 1300,
                 }}
-
               >
                 {/* Menu Danh mục */}
                 <Box
                   sx={{
-                    background: "white",
+                    backgroundColor: "#ffffff",
                     color: "black",
-                    width: 300,
+                    width: 200,
                     boxShadow: 3,
                     p: 1,
+                    fontSize: '0.85rem'
                   }}
                 >
                   <List>
                     {categories.map((item, index) => (
-                      <ListItem button key={index}>
-                        <ListItemIcon>{item.icon}</ListItemIcon>
+                      <ListItem
+                        button
+                        key={index}
+                        onMouseEnter={() => setHoveredCategory(item.value)}
+                        sx={{ '&:hover': { backgroundColor: "#f5f5f5" } }}
+                      >
+                        <ListItemIcon sx={{ color: "black" }}>
+                          {item.icon}
+                        </ListItemIcon>
                         <ListItemText primary={item.label} />
                       </ListItem>
                     ))}
+
                   </List>
+
                 </Box>
 
                 {/* Gợi ý cho bạn */}
-                <Box
-                  sx={{
-                    background: "#fff",
-                    boxShadow: 3,
-                    padding: 2,
-                    width: "calc(100vw - 330px)",
-                    maxHeight: 600,
-                    overflowY: "auto",
-                  }}
-                >
-                  <Typography variant="h6" gutterBottom>
-                    🔥 Gợi ý cho bạn
-                  </Typography>
-                  <Grid container spacing={2}>
-                    {Object.entries(phoneBrands).map(([brand, series], idx) => (
-                      <Grid item xs={6} sm={4} md={3} key={idx}>
-                        <Typography fontWeight="bold" sx={{ mb: 1 }}>
-                          {brand}
-                        </Typography>
-                        {series.map((item, i) => (
-                          <Typography key={i} sx={{ fontSize: "0.9rem" }}>
-                            {item}
+                {hoveredCategory && (
+                  <Box
+                    sx={{
+                      backgroundColor: "#FFFFFF",
+                      color: "black",
+                      boxShadow: 3,
+                      padding: 2,
+                      width: "calc(100vw - 330px)",
+                      maxWidth: 800,
+                      maxHeight: 600,
+                      overflowY: "auto",
+                      zIndex: 1300,
+                      fontSize: '0.85rem'
+                    }}
+                  >
+
+
+                    {/* Nhóm sản phẩm theo thương hiệu */}
+                    <Grid container spacing={4}>
+                      {filteredProducts.length === 0 ? (
+                        <Grid item xs={12}>
+                          <Typography variant="body1" sx={{ color: "#555", fontStyle: "italic", ml: 2 }}>
+                            Gợi ý cho bạn
                           </Typography>
-                        ))}
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
+                        </Grid>
+                      ) : (
+                        Object.entries(groupedProducts).map(([brand, items], index) => (
+                          <Grid item xs={12} sm={6} md={4} key={index}>
+
+                            <Typography variant="subtitle1" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center' }}>
+                              {brand}
+                              <Box component="span" sx={{ ml: 1 }}>{'>'}</Box>
+                            </Typography>
+                            <Box sx={{ mt: 1 }}>
+                              {items.map((product, i) => {
+                                const priceAfterDiscount =
+                                  product.discountPrice && product.discountPrice < product.price
+                                    ? product.price - product.discountPrice
+                                    : product.price;
+
+                                return (
+                                  <Typography
+                                    key={i}
+                                    variant="body2"
+                                    sx={{ ml: 1, color: "#333", fontSize: '0.75rem ', cursor: "pointer", '&:hover': { textDecoration: 'underline' } }}
+                                    onClick={() =>
+                                      navigate(`/${slugify(product.category)}/${slugify(product.name)}`, {
+                                        state: {
+                                          ...product,
+                                          priceAfterDiscount,
+                                        },
+                                      })
+                                    }
+                                  >
+                                    {product.name}
+                                  </Typography>
+                                );
+                              })}
+                            </Box>
+                          </Grid>
+                        ))
+                      )}
+                    </Grid>
+
+                  </Box>
+                )}
               </Box>
             )}
           </Box>
 
+
           {/* Thanh tìm kiếm */}
           <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {/* Thanh tìm kiếm */}
+
             <TextField
               autoComplete="off"
               value={searchQuery}

@@ -41,10 +41,20 @@ const Footer = () => {
           {/* Hỗ trợ thanh toán */}
           <Grid item xs={12} md={3}>
             <Typography variant="h6">HỖ TRỢ THANH TOÁN</Typography>
-            <img src="https://via.placeholder.com/150x50" alt="Payment Methods" style={{ width: "100%" }} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <img src="https://cdn2.fptshop.com.vn/svg/visa_icon_44fe6e15ed.svg" alt="Visa Payment" style={{ width: "30%", marginBottom: 10 }} />
+              <img src="https://cdn2.fptshop.com.vn/svg/zalopay_icon_26d64ea93f.svg" alt="Mastercard Payment" style={{ width: "30%", marginBottom: 10 }} />
+              <img src="https://cdn2.fptshop.com.vn/svg/googlepay_icon_afa293cc14.svg" alt="Paypal Payment" style={{ width: "30%", marginBottom: 10 }} />
+            </div>
+
             <Typography variant="h6" style={{ marginTop: 20 }}>CHỨNG NHẬN</Typography>
-            <img src="https://via.placeholder.com/150x50" alt="Certifications" style={{ width: "100%" }} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <img src="https://cdn2.fptshop.com.vn/svg/dmca_icon_8fc6622bd5.svg" alt="DMCA Certification" style={{ width: "30%", marginBottom: 10 }} />
+              <img src="https://cdn2.fptshop.com.vn/svg/thuong_hieu_manh_2013_icon_b56f772475.svg" alt="ISO Certification" style={{ width: "30%", marginBottom: 10 }} />
+              <img src="https://cdn2.fptshop.com.vn/svg/san_pham_dich_vu_hang_dau_viet_nam_icon_282a9ba4f7.svg" alt="ISO Certification" style={{ width: "30%", marginBottom: 10 }} />
+            </div>
           </Grid>
+
         </Grid>
       </Container>
     </footer>

@@ -16,6 +16,7 @@ import { useConfirm } from 'material-ui-confirm'
 import { toast } from 'react-toastify'
 import { useDispatch } from 'react-redux'
 import { logOutAPI, updateUserAPI } from '../../components/redux/user/userSlice.js'
+import { clearCart } from '../../components/redux/cart/cartSlice.js'
 
 function SecurityTab() {
   const dispatch = useDispatch()
@@ -43,6 +44,7 @@ function SecurityTab() {
         if (!res.error) {
           toast.success('Successfully changed your password,please login again')
           dispatch(logOutAPI(false)).then(() => {
+            dispatch(clearCart());
             navigate('/login');
           });
 

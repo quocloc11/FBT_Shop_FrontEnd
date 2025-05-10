@@ -4,7 +4,8 @@ import {
   Breadcrumbs, CardMedia, Typography, FormControl, Divider,
   InputLabel, Select, MenuItem, Checkbox, ListItemText, Slider, Box, FormControlLabel,
   TextField,
-  FormGroup
+  FormGroup,
+  styled
 } from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
 import Header from "../../Hearder/Header";
@@ -119,11 +120,28 @@ const ProductList = () => {
       return 0; // mặc định không sắp xếp
     });
 
-  const handleClickProduct = async (product) => {
-    await addViewProductAPI(product); // Gọi API trước
-    navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product }); // Sau đó chuyển trang
-  };
 
+  const handleClickProduct = async (product) => {
+    await addViewProductAPI(product);
+
+    const priceAfterDiscount =
+      product.discountPrice && product.discountPrice < product.price
+        ? product.price - product.discountPrice
+        : product.price;
+
+    navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, {
+      state: {
+        ...product,
+        priceAfterDiscount,
+      },
+    });
+  };
+  const StyledCard = styled(Card)({
+    boxShadow: "none",
+    borderRadius: "10px",
+    textAlign: "center",
+    padding: "10px",
+  });
 
   return (
     <>
@@ -304,37 +322,93 @@ const ProductList = () => {
             <Grid container spacing={2}>
               {filteredProducts.map((product) => (
                 <Grid item xs={12} sm={6} md={3} key={product.id}>
-                  <Card
+                  <StyledCard
                     onClick={() => handleClickProduct(product)}
                     sx={{
-                      cursor: 'pointer',
-                      transition: 'transform 0.2s ease',
-                      '&:hover': {
-                        transform: 'scale(1.02)',
+                      cursor: "pointer",
+                      border: "1px solid #e0e0e0", // Thêm dòng này để có border
+                      borderRadius: "8px", // Tuỳ chọn bo góc nếu muốn
+                      transition: "box-shadow 0.3s ease-in-out",
+                      "&:hover": {
                         boxShadow: 3,
                       },
                     }}
                   >
+
                     <CardMedia
                       component="img"
                       image={product.images}
-                      alt={product.name}
+                      alt={product.title}
                       sx={{
-                        height: 200,
-                        width: '100%',
-                        objectFit: 'cover',
-                        borderRadius: 1,
+                        objectFit: "cover",
+                        width: "100%",
+                        borderRadius: "4px",
+                        transition: "transform 0.3s ease-in-out, opacity 0.3s ease-in-out",
+                        "&:hover": {
+                          transform: "scale(1.05)",
+                          opacity: 0.9,
+                        },
                       }}
                     />
+
                     <CardContent>
-                      <Typography variant="h6">{product.name}</Typography>
-                      <Typography variant="h6">{product.stock}</Typography>
-                      <Typography variant="h6">{product.promotion}</Typography>
-                      <Typography variant="body1" color="primary">
-                        {product.price.toLocaleString()} đ
+                      {product.discountPrice && product.discountPrice < product.price ? (
+                        <>
+
+
+                          {/* Giá gốc */}
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              textDecoration: "line-through",
+                              color: "gray",
+                            }}
+                          >
+                            {Number(product.price).toLocaleString("vi-VN")} đ
+                          </Typography>
+                          {/* Giá đã giảm */}
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              color: "error.main",
+                              fontWeight: "bold",
+                              fontSize: "1.1rem",
+                              letterSpacing: "0.5px",
+                            }}
+                          >
+                            {Number(product.price - product.discountPrice).toLocaleString("vi-VN")} đ
+                          </Typography>
+                          {/* Phần giảm giá (VD: -2.000.000 đ) */}
+                          <Typography
+                            variant="body2"
+                            color="success.main"
+                            sx={{ fontWeight: 500 }}
+                          >
+                            Giảm {Number(product.discountPrice).toLocaleString("vi-VN")} đ
+
+                          </Typography>
+                        </>
+                      ) : (
+                        // Nếu không giảm giá, chỉ hiển thị giá gốc
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: "black",
+                            fontWeight: "bold",
+                            fontSize: "1.1rem",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          {Number(product.price).toLocaleString("vi-VN")} đ
+                        </Typography>
+                      )}
+
+                      <Typography variant="body2" color="black" mt={1}>
+                        {product.name}
                       </Typography>
                     </CardContent>
-                  </Card>
+
+                  </StyledCard>
                 </Grid>
               ))}
             </Grid>

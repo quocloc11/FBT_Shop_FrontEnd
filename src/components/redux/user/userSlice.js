@@ -114,10 +114,26 @@ export const userSlice = createSlice({
       state.isLoading = false // Dừng trạng thái tải khi có lỗi
     })
     builder.addCase(editUserAPI.fulfilled, (state, action) => {
-      const updatedUser = action.payload
-      state.users = state.users.map(user => user._id === updatedUser._id ? updatedUser : user)
-      state.filteredUsers = state.filteredUsers.map(user => user._id === updatedUser._id ? updatedUser : user)
-    })
+      const updatedUser = action.payload;
+
+      // Cập nhật trong danh sách users và filteredUsers
+      state.users = state.users.map(user => user._id === updatedUser._id ? updatedUser : user);
+      state.filteredUsers = state.filteredUsers.map(user => user._id === updatedUser._id ? updatedUser : user);
+
+      // ⚠️ Cập nhật currentUser nếu người dùng đang đăng nhập chính là người vừa được sửa
+      if (state.currentUser && state.currentUser._id === updatedUser._id) {
+        state.currentUser = updatedUser;
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+        if (updatedUser.role !== 'admin') {
+          state.currentUser = null;
+          localStorage.removeItem('currentUser');
+          toast.info('Your role has changed. Please login again.');
+        }
+      }
+
+    });
+
     // 🆕 Delete User (Soft Delete)
     builder.addCase(deleteUserAPI.fulfilled, (state, action) => {
       const { userId } = action.payload

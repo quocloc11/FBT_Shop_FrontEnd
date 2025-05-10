@@ -24,13 +24,15 @@ import SettingsPage from "./pages/DashBoard/SettingsPage";
 import AdminLayout from "./components/Layout/AdminLayout.jsx";
 import OrderSuccess from "./pages/PageOrder/OrderSuccess.jsx";
 import SearchPage from "./pages/SearchPage/SearchPage.jsx";
+import PrivateRoute from "./routes/PrivateRoute.jsx";
+import Unauthorized from "./pages/PrivateRoute/Unauthorized.jsx";
 
 // import Sidebar from "./components/AdminDashBoard/common/Sidebar.jsx";
 
 export const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const App = () => {
-  const token = useSelector(state => state.user.token);
+  const token = useSelector(state => state.user.currentUser?.accessToken);
   // console.log('token', token)
   return (
 
@@ -69,7 +71,15 @@ const App = () => {
 
         {/* <Sidebar /> */}
         {/* Admin */}
-        <Route path="/dashboard" element={<AdminLayout />}>
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <AdminLayout />
+            </PrivateRoute>
+          }
+        >
+
           <Route index element={<OverviewPage />} />
           <Route path='/dashboard/products' element={<ProductsPage />} />
           <Route path='/dashboard/users' element={<UsersPage />} />
@@ -77,8 +87,10 @@ const App = () => {
           <Route path='/dashboard/orders' element={<OrdersPage />} />
           <Route path='/dashboard/analytics' element={<AnalyticsPage />} />
           <Route path='/dashboard/settings' element={<SettingsPage />} />
-        </Route>
 
+
+        </Route>
+        <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/" element={token ? <HomePage /> : <Navigate to="/login" />} />
         <Route path='*' element={<NotFound />} />
       </Routes>

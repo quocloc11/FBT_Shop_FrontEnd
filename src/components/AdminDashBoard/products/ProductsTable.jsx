@@ -28,6 +28,7 @@ const ProductsTable = () => {
 		quantity: 0,
 		images: "",
 		brand: "",
+		discountPrice: 0
 		//	flashSale: false
 	});
 
@@ -92,6 +93,7 @@ const ProductsTable = () => {
 					promotion: "",
 					specs: "",
 					quantity: 0,
+					discountPrice: 0,
 					brand: "",
 					images: [],
 					//	flashSale: false
@@ -178,7 +180,7 @@ const ProductsTable = () => {
 				<table className="min-w-full divide-y divide-gray-700">
 					<thead>
 						<tr>
-							{["Name", "Category", "Price", "Stock", "quantity", "Actions"].map((header) => (
+							{["Name", "Category", "Price", "discountPrice", "Stock", "quantity", "Actions"].map((header) => (
 								<th
 									key={header}
 									className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
@@ -210,6 +212,9 @@ const ProductsTable = () => {
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.promotion}</td>  */}
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
 									{product?.price.toFixed(2)} đ
+								</td>
+								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+									{product?.discountPrice.toFixed(2)} đ
 								</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product?.stock}</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product?.quantity}</td>
@@ -268,7 +273,7 @@ const ProductsTable = () => {
 						>
 							<div className="grid grid-cols-2 gap-4">
 
-								{["name", "category", "price", "stock", "video", "promotion", "specs", "quantity", "brand"].map((field) => (
+								{["name", "category", "price", "discountPrice", "stock", "video", "promotion", "specs", "quantity", "brand"].map((field) => (
 									<div key={field}>
 										<label className="text-sm text-gray-300 capitalize">{field}</label>
 
@@ -290,7 +295,7 @@ const ProductsTable = () => {
 											</select>
 										) : (
 											<input
-												type={["price", "stock", "quantity"].includes(field) ? "number" : "text"}
+												type={["price", "discountPrice", "stock", "quantity"].includes(field) ? "number" : "text"}
 												className="w-full p-2 mt-1 bg-gray-700 text-gray-300 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
 												value={newProduct[field] || ""}
 												onChange={(e) => setNewProduct({ ...newProduct, [field]: e.target.value })}
@@ -316,18 +321,7 @@ const ProductsTable = () => {
 									/>
 								</div>
 							</div>
-							{/* <div>
-								<label className="text-sm text-gray-300 capitalize">flashSale</label>
-								<select
-									className="w-full p-2 mt-1 bg-gray-700 text-gray-300 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-									value={newProduct.flashSale}
-									onChange={(e) => setNewProduct({ ...newProduct, flashSale: e.target.value === 'true' })}
-									required
-								>
-									<option value="false">Không</option>
-									<option value="true">Có</option>
-								</select>
-							</div> */}
+
 
 							{/* Image preview */}
 							{newProduct.images && newProduct.images.length > 0 && (

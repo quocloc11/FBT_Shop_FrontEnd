@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import Product from "../components/Product"
-import { Link } from "react-router-dom";
-import { VITE_BACKEND_URL } from "../App";
+import { useDispatch, useSelector } from "react-redux"; // thêm
 
 import Header from "./Hearder/Header";
 import Body from "./Body/Body";
@@ -14,29 +11,23 @@ import BodyProduct from "./Body/BodyProduct/BodyProduct";
 import ViewedProducts from "./ViewProduct/ViewProduct";
 import FlashSale from "./FlashSale/FlashSale";
 import { getProductAPI } from "../apis";
-//import { getProductAPI } from "../components/redux/product/productSlice";
+import { getCartProductAPI } from "../components/redux/cart/cartSlice";
 
 const HomePage = () => {
-
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    const dispatch = useDispatch();
+    const token = useSelector(state => state.user.currentUser?.accessToken);
 
     const getProducts = async () => {
         try {
             setIsLoading(true);
-            // const response = await axios.get(`${VITE_BACKEND_URL}/api/products/`);
-
             getProductAPI().then(res => {
-
-                setProducts(res || [])
+                setProducts(res || []);
             }).finally(() => {
                 setIsLoading(false);
-            })
-
-            // console.log(response.data);
-            // setProducts(response.data);
-            setIsLoading(false);
-
+            });
         } catch (error) {
             console.log(error);
         }
@@ -44,7 +35,13 @@ const HomePage = () => {
 
     useEffect(() => {
         getProducts();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (token) {
+            dispatch(getCartProductAPI());
+        }
+    }, [token, dispatch]); // Gọi cart API mỗi khi user thay đổi hoặc dispatch mới
 
     return (
         <>
@@ -58,8 +55,7 @@ const HomePage = () => {
             <ViewedProducts />
             <Footer />
         </>
-    )
+    );
 }
-
 
 export default HomePage;

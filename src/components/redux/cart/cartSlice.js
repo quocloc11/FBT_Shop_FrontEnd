@@ -16,6 +16,7 @@ export const createCartProductAPI = createAsyncThunk(
   async (product, { rejectWithValue }) => {
     try {
       const response = await authorizedAxiosInstance.post(`${API_ROOT}/cart`, product);
+      console.log("🚀 Tạo giỏ hàng trả về:", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');
@@ -65,8 +66,11 @@ const cartSlice = createSlice({
     },
     // Hành động để xóa toàn bộ giỏ hàng
     clearCart: (state) => {
-      state.carts = []; // Xóa tất cả sản phẩm trong giỏ
-    },
+      state.carts = [];
+      console.log('[clearCart] carts đã bị xóa:', state.carts);
+      localStorage.removeItem('cart'); // Chỉ cần nếu bạn thực sự dùng localStorage
+    }
+
   },
   extraReducers: (builder) => {
     builder
@@ -76,12 +80,10 @@ const cartSlice = createSlice({
       })
       .addCase(createCartProductAPI.fulfilled, (state, action) => {
         state.loading = false;
-        if (!Array.isArray(state.carts)) {
-          state.carts = []; // Nếu chưa phải array, set thành array
-        }
-        state.carts.push(action.payload);
+        state.carts = action.payload.items; // ✅ chỉ lấy mảng sản phẩm
         state.successMessage = 'Thêm sản phẩm vào giỏ hàng thành công!';
       })
+
 
       .addCase(createCartProductAPI.rejected, (state, action) => {
         state.loading = false;
@@ -94,7 +96,7 @@ const cartSlice = createSlice({
       })
       .addCase(getCartProductAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.carts = action.payload;
+        state.carts = action.payload.items;
       })
       .addCase(getCartProductAPI.rejected, (state, action) => {
         state.loading = false;
@@ -105,14 +107,20 @@ const cartSlice = createSlice({
       .addCase(deleteCartProductAPI.pending, (state) => {
         state.loading = true;
       })
+      // .addCase(deleteCartProductAPI.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   // Cập nhật giỏ hàng sau khi xóa sản phẩm
+      //   // Kiểm tra nếu sản phẩm có trong giỏ hàng
+      //   state.carts.items = state.carts.items.filter(item => item._id !== action.payload._id);
+
+      //   state.successMessage = 'Đã xóa sản phẩm khỏi giỏ hàng!';
+      // })
       .addCase(deleteCartProductAPI.fulfilled, (state, action) => {
         state.loading = false;
-        // Cập nhật giỏ hàng sau khi xóa sản phẩm
-        // Kiểm tra nếu sản phẩm có trong giỏ hàng
-        state.carts.items = state.carts.items.filter(item => item._id !== action.payload._id);
-
+        state.carts = state.carts.filter(item => item._id !== action.payload._id);
         state.successMessage = 'Đã xóa sản phẩm khỏi giỏ hàng!';
       })
+
       .addCase(deleteCartProductAPI.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Có lỗi xảy ra khi xóa sản phẩm khỏi giỏ hàng';

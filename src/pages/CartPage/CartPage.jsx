@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import {
   Box, Button, Card, CardContent, Collapse, Divider,
   FormControl, Grid, IconButton, InputLabel, MenuItem,
-  Select, TextField, Typography, Checkbox
+  Select, TextField, Typography, Checkbox,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -12,14 +16,13 @@ import CategoryMenu from '../CategoryMenu/CategoryMenu';
 //import { deleteCartProductAPI, getCartProductAPI } from '../../apis';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
-
 import ViewedProducts from '../ViewProduct/ViewProduct';
 import "toastify-js/src/toastify.css"
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { createOrderProductAPI, deleteOrderProductAPI, getOrderProductAPI } from '../../components/redux/order/orderSlice';
 import { clearCart, deleteCartProductAPI, getCartProductAPI } from '../../components/redux/cart/cartSlice';
-
+import PaymentIcon from '@mui/icons-material/Payment';
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [warrantyOption, setWarrantyOption] = useState('');
@@ -28,22 +31,12 @@ const CartPage = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [loadingOrder, setLoadingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('');
 
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
-  // useEffect(() => {
-  //   dispatch(getCartProductAPI())
-  //     .then(response => {
-  //       console.log('response', response);  // Kiểm tra dữ liệu trả về
-  //       setCartItems(response.payload.items);
-  //     })
-  //     .catch(error => {
-  //       console.error('Có lỗi xảy ra khi lấy dữ liệu giỏ hàng', error);
-  //     });
-  // }, [dispatch]);
   useEffect(() => {
     dispatch(getCartProductAPI())
       .then(response => {
@@ -59,8 +52,12 @@ const CartPage = () => {
       });
   }, [dispatch]);
 
-  console.log('cartItems', cartItems);
 
+  const QR_IMAGE_MAP = {
+    bank: 'https://api.qrserver.com/v1/create-qr-code/?data=Chuyen%20khoan%20NGAN%20HANG%20ABC%20-%20So%20TK%3A%20123456789&size=200x200',
+    momo: 'https://api.qrserver.com/v1/create-qr-code/?data=Thanh%20toan%20MOMO%20-%20SDT%3A%200901234567&size=200x200',
+    zalopay: 'https://api.qrserver.com/v1/create-qr-code/?data=ZaloPay%20-%20User%3A%20zalo_user_demo&size=200x200',
+  };
 
   const handleQuantityChange = (index, delta) => {
     setCartItems(prev => {
@@ -71,53 +68,102 @@ const CartPage = () => {
   };
 
   const handleRemoveCart = async (productId) => {
+    console.log("Đang xóa productId:", productId); // 👈 kiểm tra id gửi đi
     try {
       await dispatch(deleteCartProductAPI(productId));
       const response = await dispatch(getCartProductAPI());
-      console.log('response', response)
+      console.log("Giỏ hàng sau khi xóa:", response.payload.items);
       setCartItems(response.payload.items);
+      console.log('cartItems', cartItems)
     } catch (error) {
-      console.error("Có lỗi khi xử lý xóa sản phẩm", error);
+      console.error("Lỗi khi xóa sản phẩm:", error);
     }
   };
 
 
-
-
-  //const total = cartItems.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
 
   const total = cartItems && Array.isArray(cartItems) && cartItems.length > 0
     ? cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
     : 0;
+  const totalOriginal = cartItems && Array.isArray(cartItems) && cartItems.length > 0
+    ? cartItems.reduce((sum, item) => sum + (item.originalPrice || item.price) * item.quantity, 0)
+    : 0;
+
+  const totalDiscount = totalOriginal - total;
+  // const handleConfirmOrder = async (order) => {
+  //   if (!paymentMethod) {
+  //     toast.error("Vui lòng chọn phương thức thanh toán!");
+  //     return; // Dừng việc gửi đơn hàng nếu chưa chọn phương thức thanh toán
+  //   }
+
+  //   try {
+  //     // Thêm thông tin phương thức thanh toán vào đơn hàng
+  //     const orderWithPayment = { ...order, paymentMethod };
+
+  //     // Bắt đầu tạo đơn hàng
+  //     const action = await dispatch(createOrderProductAPI(orderWithPayment)); // Gọi API tạo đơn hàng và đợi kết quả
+
+  //     if (action.type === 'orders/createOrderProductAPI/fulfilled') {
+  //       const orderId = action.payload._id;
+
+  //       // Xóa giỏ hàng
+  //       await Promise.all(cartItems.map(item => dispatch(deleteCartProductAPI(item.productId))));
+  //       dispatch(clearCart());
+
+  //       // Fetch lại đơn hàng mới nhất từ server
+  //       await dispatch(getOrderProductAPI()); // ✅ Thêm dòng này để cập nhật lại danh sách orders
+
+  //       toast.success("Đơn hàng đặt thành công!");
+  //       navigate(`/order-success?order_id=${orderId}`);
+
+  //     } else {
+  //       // Xử lý khi action thất bại
+  //       toast.error("Đặt hàng thất bại!"); // Thông báo thất bại
+  //     }
+  //   } catch (err) {
+  //     // Xử lý lỗi khi có lỗi xảy ra trong quá trình tạo đơn hàng hoặc xóa sản phẩm
+  //     toast.error("Lỗi khi đặt hàng: " + (err.response?.data?.message || err.message));
+  //   }
+  // };
+
   const handleConfirmOrder = async (order) => {
+    if (!paymentMethod) {
+      toast.error("Vui lòng chọn phương thức thanh toán!");
+      return;
+    }
+
+    // Bổ sung phương thức thanh toán vào đơn hàng
+    const orderWithPayment = { ...order, paymentMethod };
+
     try {
       // Bắt đầu tạo đơn hàng
-      const action = await dispatch(createOrderProductAPI(order)); // Gọi API tạo đơn hàng và đợi kết quả
+      const action = await dispatch(createOrderProductAPI(orderWithPayment));
 
       if (action.type === 'orders/createOrderProductAPI/fulfilled') {
         const orderId = action.payload._id;
 
-        // Xóa giỏ hàng
+        // Xóa giỏ hàng sau khi đặt hàng thành công
         await Promise.all(cartItems.map(item => dispatch(deleteCartProductAPI(item.productId))));
         dispatch(clearCart());
 
-        // Fetch lại đơn hàng mới nhất từ server
-        await dispatch(getOrderProductAPI()); // ✅ Thêm dòng này để cập nhật lại danh sách orders
+        // Cập nhật lại đơn hàng mới từ server
+        await dispatch(getOrderProductAPI());
 
-        toast.success("Đơn hàng đặt thành công!");
+        // Hiển thị thông báo thành công
+        toast.success("Đơn hàng đã được đặt thành công!");
+
+        // Điều hướng tới trang kết quả đặt hàng thành công
         navigate(`/order-success?order_id=${orderId}`);
 
-
       } else {
-        // Xử lý khi action thất bại
-        toast.error("Đặt hàng thất bại!"); // Thông báo thất bại
+        // Xử lý khi tạo đơn hàng thất bại
+        toast.error("Đặt hàng thất bại!");
       }
     } catch (err) {
-      // Xử lý lỗi khi có lỗi xảy ra trong quá trình tạo đơn hàng hoặc xóa sản phẩm
+      // Xử lý lỗi khi có lỗi trong quá trình tạo đơn hàng
       toast.error("Lỗi khi đặt hàng: " + (err.response?.data?.message || err.message));
     }
   };
-
   return (
     <>
       <Header />
@@ -169,9 +215,21 @@ const CartPage = () => {
                           <Box flex={1}>
 
                             <Typography fontWeight="bold">{item.name}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Giá: {item.price.toLocaleString()} đ
+                            {/* {item.promotion && (
+    <Typography variant="body2" color="success.main" mt={1}>
+      Ưu đãi: {item.promotion}
+    </Typography>
+  )} */}
+                            {item.originalPrice && item.originalPrice > item.price && (
+                              <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+                                {Number(item.originalPrice).toLocaleString('vi-VN')} đ
+                              </Typography>
+                            )}
+
+                            <Typography variant="body1" fontWeight="bold" color="error">
+                              {Number(item.price).toLocaleString('vi-VN')} đ
                             </Typography>
+
                             <Box display="flex" alignItems="center" mt={1}>
                               <IconButton onClick={() => handleQuantityChange(index, -1)}>
                                 <RemoveIcon />
@@ -201,29 +259,24 @@ const CartPage = () => {
                 <Typography fontWeight="bold" gutterBottom>
                   Thông tin đơn hàng
                 </Typography>
+                <Divider sx={{ my: 1 }} />
                 <Box display="flex" justifyContent="space-between">
                   <Typography>Tổng tiền</Typography>
-                  <Typography>{total.toLocaleString()} đ</Typography>
+                  <Typography>{totalOriginal.toLocaleString('vi-VN')} đ</Typography>
                 </Box>
+                <Divider sx={{ my: 1 }} />
+                <Box display="flex" justifyContent="space-between">
+                  <Typography>Tổng khuyến mãi</Typography>
+                  <Typography>{totalDiscount.toLocaleString('vi-VN')} đ</Typography>
+                </Box>
+                <Divider sx={{ my: 1 }} />
+                <Box display="flex" justifyContent="space-between">
+                  <Typography>Cần thanh toán</Typography>
+                  <Typography sx={{ color: 'red', fontWeight: 'bold' }}>
+                    {total.toLocaleString('vi-VN')} đ
+                  </Typography>
 
-                <Typography fontWeight="bold" mt={2}>
-                  Chọn gói bảo hành
-                </Typography>
-                <FormControl fullWidth sx={{ mt: 1 }}>
-                  <Select
-                    value={warrantyOption}
-                    onChange={(e) => setWarrantyOption(e.target.value)}
-                    displayEmpty
-                  >
-                    <MenuItem value="">-- Không chọn --</MenuItem>
-                    <MenuItem value="full">
-                      Bảo hành trọn đời +350.000 đ <s style={{ marginLeft: 8 }}>500.000 đ</s>
-                    </MenuItem>
-                    <MenuItem value="1year">
-                      Bảo hành thêm 1 năm +150.000 đ <s style={{ marginLeft: 8 }}>300.000 đ</s>
-                    </MenuItem>
-                  </Select>
-                </FormControl>
+                </Box>
 
                 <Box mt={2}>
                   <Button size="small" onClick={() => setDetailsOpen(!detailsOpen)}>
@@ -236,23 +289,7 @@ const CartPage = () => {
                   </Collapse>
                 </Box>
 
-                {showInput && (
-                  <Box mt={2}>
-                    <TextField
-                      label="Họ và tên"
-                      fullWidth
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      sx={{ mb: 2 }}
-                    />
-                    <TextField
-                      label="Số điện thoại"
-                      fullWidth
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </Box>
-                )}
+
 
                 <Button
                   variant="contained"
@@ -265,36 +302,132 @@ const CartPage = () => {
                 </Button>
 
                 {showInput && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                    onClick={() => {
-                      if (!name.trim() || !phone.trim()) {
-                        toast.error("Vui lòng nhập đầy đủ họ tên và số điện thoại!");
-                        return;
-                      }
-                      const simplifiedItems = cartItems.map(item => ({
-                        productId: item.productId, // hoặc item.id nếu bạn lưu bằng key đó
-                        quantity: item.quantity || 1,
-                        name: item.name,
-                        price: item.price
-                      }));
+                  <Box mt={2}>
+                    <TextField
+                      fullWidth
+                      label="Họ và tên"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Số điện thoại"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
 
-                      setLoadingOrder(true); // bắt đầu loading
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <FormLabel>Phương thức thanh toán</FormLabel>
+                      <RadioGroup
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                      >
+                        <FormControlLabel
+                          value="cod"
+                          control={<Radio />}
+                          label={
+                            <Box display="flex" alignItems="center">
+                              <img
+                                src="https://s3-sgn09.fptcloud.com/ict-payment-icon/payment/cod.png"
+                                alt="COD"
+                                style={{ width: 30, height: 30, marginRight: 8 }}
+                              />
+                              Thanh toán khi nhận hàng (COD)
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel
+                          value="bank"
+                          control={<Radio />}
+                          label={
+                            <Box display="flex" alignItems="center">
+                              <img
+                                src="https://s3-sgn09.fptcloud.com/ict-payment-icon/payment/alepay.png"
+                                alt="Chuyển khoản"
+                                style={{ width: 30, height: 30, marginRight: 8 }}
+                              />
+                              Chuyển khoản ngân hàng
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel
+                          value="zalopay"
+                          control={<Radio />}
+                          label={
+                            <Box display="flex" alignItems="center">
+                              <img
+                                src="https://s3-sgn09.fptcloud.com/ict-payment-icon/payment/zalopay.png"
+                                alt="ZaloPay"
+                                style={{ width: 30, height: 30, marginRight: 8 }}
+                              />
+                              Thanh toán bằng ví ZaloPay
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel
+                          value="momo"
+                          control={<Radio />}
+                          label={
+                            <Box display="flex" alignItems="center">
+                              <img
+                                src="https://s3-sgn09.fptcloud.com/ict-payment-icon/payment/momo.png"
+                                alt="MOMO"
+                                style={{ width: 30, height: 30, marginRight: 8 }}
+                              />
+                              Ví điện tử MOMO
+                            </Box>
+                          }
+                        />
+                      </RadioGroup>
+                      {QR_IMAGE_MAP[paymentMethod] && (
+                        <Box mt={2} textAlign="center">
+                          <Typography variant="subtitle2" gutterBottom>Mã QR thanh toán</Typography>
+                          <img
+                            src={QR_IMAGE_MAP[paymentMethod]}
+                            alt="QR Code"
+                            style={{ width: 200, height: 200 }}
+                          />
+                        </Box>
+                      )}
 
-                      // Gọi handleConfirmOrder với đúng thông tin
-                      handleConfirmOrder({
-                        customerName: name,
-                        phoneNumber: phone,
-                        items: simplifiedItems,
-                        total,
-                      }).finally(() => setLoadingOrder(false)); // kết thúc loading
-                    }}
-                  >
-                    Xác nhận thông tin và hoàn tất
-                  </Button>
+                    </FormControl>
+
+
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      disabled={loadingOrder}
+                      onClick={() => {
+                        if (!name.trim() || !phone.trim() || !paymentMethod) {
+                          toast.error("Vui lòng nhập đầy đủ họ tên, số điện thoại và chọn phương thức thanh toán!");
+                          return;
+                        }
+
+                        const simplifiedItems = cartItems.map(item => ({
+                          productId: item.productId,
+                          quantity: item.quantity || 1,
+                          name: item.name,
+                          price: item.price
+                        }));
+
+                        setLoadingOrder(true);
+
+                        handleConfirmOrder({
+                          customerName: name,
+                          phoneNumber: phone,
+                          items: simplifiedItems,
+                          total,
+                          paymentMethod,
+                        }).finally(() => setLoadingOrder(false));
+                      }}
+                    >
+                      Xác nhận thông tin và hoàn tất
+                    </Button>
+                  </Box>
+
 
                 )}
 
