@@ -109,6 +109,7 @@ const UsersTable = () => {
 							</tr>
 						) : (
 							filteredUsers.map((user) => (
+
 								<motion.tr
 									key={user._id} // Use _id for MongoDB
 									initial={{ opacity: 0 }}

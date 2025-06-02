@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaShoppingCart, FaBars, FaUser } from "react-icons/fa";
-import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer, Badge, CircularProgress } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, IconButton, MenuItem, Menu, Container, Typography, Grid, ListItemIcon, ListItemText, ListItem, List, Drawer, Badge, CircularProgress, Tooltip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Clear, Search, ShoppingCart } from "@mui/icons-material";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -65,7 +65,7 @@ const Header = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
-
+  const token = useSelector(state => state.user.currentUser?.accessToken);
   const [searchHistory, setSearchHistory] = useState(() => {
     const stored = localStorage.getItem('searchHistory');
     return stored ? JSON.parse(stored) : [];
@@ -209,6 +209,10 @@ const Header = () => {
     acc[brand].push(product);
     return acc;
   }, {});
+
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
   return (
     <Box sx={{ backgroundColor: '#cb1c22', color: 'white', px: 8, py: 1, position: 'relative' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -235,7 +239,8 @@ const Header = () => {
                 borderRadius: "20px",
                 paddingX: "16px",
                 minHeight: "43px",
-                marginRight: "10px"
+                marginRight: "10px",
+                whiteSpace: 'nowrap'
               }}
             >
               Danh mục
@@ -293,8 +298,9 @@ const Header = () => {
                       color: "black",
                       boxShadow: 3,
                       padding: 2,
-                      width: "calc(100vw - 330px)",
-                      maxWidth: 800,
+                      width: "min(calc(100vw - 330px), 800px)",
+                      minWidth: 250,
+
                       maxHeight: 600,
                       overflowY: "auto",
                       zIndex: 1300,
@@ -358,7 +364,19 @@ const Header = () => {
 
 
           {/* Thanh tìm kiếm */}
-          <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              //alignItems: 'center',
+              alignItems: 'stretch',
+              width: '100%',         // ✅ Cho phép chiếm toàn bộ chiều ngang cha
+              maxWidth: '600px',     // ✅ Giới hạn nếu cần (hoặc bỏ nếu muốn full 100%)
+              px: 2,                 // ✅ Thêm padding ngang nếu cần
+              mx: 'auto'             // ✅ Căn giữa nếu dùng trong container lớn
+            }}
+          >
             {/* Thanh tìm kiếm */}
 
             <TextField
@@ -374,8 +392,11 @@ const Header = () => {
               variant="outlined"
               sx={{
                 backgroundColor: 'white',
-                width: '600px',
+                width: '100%', // không cố định, sẽ chiếm theo cha
+                maxWidth: '600px', // giới hạn tối đa, tránh quá to
+                transition: 'all 0.3s ease',
                 borderRadius: '50px',
+
                 '& fieldset': { border: 'none' },
               }}
               InputProps={{
@@ -412,7 +433,9 @@ const Header = () => {
                 position: 'absolute',
                 top: '60px',
                 left: 0,
-                width: '600px',
+                width: '100%',
+                maxWidth: '600px',
+
                 backgroundColor: 'white',
                 borderRadius: '10px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -420,69 +443,95 @@ const Header = () => {
               }}>
                 <ul style={{ listStyleType: 'none', padding: '0', margin: '0' }}>
                   {suggestions.length > 0 ? (
-                    suggestions.map((product, index) => (
-                      <li key={index} style={{ padding: '10px', borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
-                        onMouseDown={() => navigate(`/${slugify(product.category)}/${slugify(product.name)}`, { state: product })}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <img src={product.images} alt={product.name} style={{ width: '40px', height: '40px', objectFit: 'cover', marginRight: '10px' }} />
-                          <div>
-                            <div style={{ color: '#ff0000' }}>{product.name}</div>
-                            <div style={{ color: '#ff0000' }}>{product.price} VND</div>
+                    suggestions.map((product, index) => {
+                      const priceAfterDiscount =
+                        product.discountPrice && product.discountPrice < product.price
+                          ? product.price - product.discountPrice
+                          : product.price;
+
+                      return (
+                        <li
+                          key={index}
+                          style={{
+                            padding: '10px',
+                            borderBottom: '1px solid #f0f0f0',
+                            cursor: 'pointer',
+                          }}
+                          onMouseDown={() =>
+                            navigate(`/${slugify(product.category)}/${slugify(product.name)}`, {
+                              state: {
+                                ...product,
+                                priceAfterDiscount,
+                              },
+                            })
+                          }
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <img
+                              src={product.images}
+                              alt={product.name}
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                objectFit: 'cover',
+                                marginRight: '10px',
+                                borderRadius: '4px',
+                              }}
+                            />
+                            <div>
+                              <div style={{ color: '#ff0000', fontWeight: '500' }}>{product.name}</div>
+                              <div style={{ color: '#ff0000', fontSize: '14px' }}>
+                                {product.price.toLocaleString()} VND
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </li>
-                    ))
+                        </li>
+                      );
+                    })
                   ) : (
+                    // phần searchHistory giữ nguyên như bạn đã viết
                     searchHistory.map((item, index) => (
-                      <li key={index} style={{
-                        padding: '10px',
-                        borderBottom: '1px solid #f0f0f0',
-                        cursor: 'pointer',
-                        color: '#555',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}>
-                        <span onMouseDown={() => {
-                          setSearchQuery(item);
-                          handleSearch();
-                        }}>
+                      <li
+                        key={index}
+                        style={{
+                          padding: '10px',
+                          borderBottom: '1px solid #f0f0f0',
+                          cursor: 'pointer',
+                          color: '#555',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <span
+                          onMouseDown={() => {
+                            setSearchQuery(item);
+                            handleSearch();
+                          }}
+                          style={{ flex: 1 }}
+                        >
                           🔍 {item}
                         </span>
-                        <span
+                        <IconButton
+                          sx={{
+                            padding: '0',
+                            color: '#ff0000',
+                            '&:hover': {
+                              backgroundColor: 'transparent',
+                            },
+                          }}
                           onClick={(e) => {
-                            e.stopPropagation(); // Tránh việc click vào span cha
+                            e.stopPropagation();
                             handleDeleteHistoryItem(item);
                           }}
-                          style={{
-                            marginLeft: '10px',
-                            color: '#ff0000',  // Đặt màu đỏ để nổi bật hơn
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '20px', // Tăng kích thước để dễ nhìn
-                          }}
                         >
-                          <IconButton
-                            sx={{
-                              padding: '0',
-                              color: '#ff0000',  // Đảm bảo màu icon là màu đỏ
-                              '&:hover': {
-                                backgroundColor: 'transparent', // Tạo hiệu ứng hover mượt mà
-                              },
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation(); // Tránh việc click vào span cha
-                              handleDeleteHistoryItem(item);
-                            }}
-                          >
-                            <DeleteIcon /> {/* Thay thế '×' bằng biểu tượng xóa */}
-                          </IconButton>
-                        </span>
-
-
+                          <DeleteIcon />
+                        </IconButton>
                       </li>
                     ))
                   )}
+
+
                 </ul>
               </div>
             )}
@@ -494,7 +543,18 @@ const Header = () => {
 
         {/* Giỏ hàng */}
         <IconButton sx={{ color: 'white' }}>
-          <Profiles />
+          {token ? (
+            <Profiles />
+          ) : (
+            <Tooltip title="Đăng nhập">
+              <IconButton
+                onClick={handleLoginClick}
+                sx={{ color: "white", fontSize: 28, p: 1.2 }}
+              >
+                <AccountCircleIcon sx={{ fontSize: 45 }} />
+              </IconButton>
+            </Tooltip>
+          )}
         </IconButton>
         <Box sx={{ display: 'flex', alignItems: 'center' }}
           onClick={() => navigate(`/gio-hang`)}

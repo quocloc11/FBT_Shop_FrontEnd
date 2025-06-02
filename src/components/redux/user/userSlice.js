@@ -76,6 +76,7 @@ export const fetchAllUsers = createAsyncThunk(
       const response = await authorizedAxiosInstance.get(`${API_ROOT}/users/users`, {
         params: { role, limit, skip }
       })
+      console.log('response.data', response)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response.data)

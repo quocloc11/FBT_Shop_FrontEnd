@@ -89,8 +89,19 @@ const SearchPage = () => {
   ];
 
   const handleClickProduct = (product) => {
-    navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product });
+    const priceAfterDiscount =
+      product.discountPrice && product.discountPrice < product.price
+        ? product.price - product.discountPrice
+        : product.price;
+
+    navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, {
+      state: {
+        ...product,
+        priceAfterDiscount,
+      },
+    });
   };
+
   useEffect(() => {
     const applyFiltersAndSorting = () => {
       let products = [...originalProducts];
