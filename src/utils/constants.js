@@ -6,7 +6,7 @@ let apiRoot = ''
 if (buildMode === 'dev') {
   apiRoot = 'http://localhost:3000'
 } else if (buildMode === 'production') {
-  apiRoot = 'https://fbt-shop-front-end.vercel.app'
+  apiRoot = 'https://fbt-shop-backend.onrender.com'
 }
 
 export const API_ROOT = apiRoot
