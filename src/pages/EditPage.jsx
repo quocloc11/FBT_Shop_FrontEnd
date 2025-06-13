@@ -18,27 +18,6 @@ const EditPage = () => {
         image: "",
     });
 
-    // const getProduct = async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const response = await getProductAPI(id)
-    //         console.log('response', response)
-
-    //         setProduct({
-    //             name: response.data.name,
-    //             quantity: response.data.quantity,
-    //             price: response.data.price,
-    //             image: response.data.image,
-    //         })
-    //         setIsLoading(false);
-
-    //     } catch (error) {
-    //         setIsLoading(false);
-    //         toast.error(error.message);
-    //     }
-
-
-    // }
 
     const getProduct = async () => {
         setIsLoading(true);

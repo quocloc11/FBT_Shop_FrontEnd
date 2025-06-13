@@ -11,19 +11,7 @@ const OrdersTable = () => {
 	const [filteredOrders, setFilteredOrders] = useState([]);
 	const dispatch = useDispatch();
 	const [selectedOrder, setSelectedOrder] = useState(null);
-	// const handleSearch = (e) => {
-	// 	const term = e.target.value.toLowerCase();
-	// 	setSearchTerm(term);
-	// 	const filtered = orderData.filter(
-	// 		(order) => order.id.toLowerCase().includes(term) || order.customer.toLowerCase().includes(term)
-	// 	);
-	// 	setFilteredOrders(filtered);
-	// };
 
-	// useEffect(() => {
-	// 	const fetchProducts = async () => {
-	// 		try {
-	// 			getOrderProductAPI
 	useEffect(() => {
 		const fetchOrders = async () => {
 			try {
@@ -41,16 +29,6 @@ const OrdersTable = () => {
 		fetchOrders();
 	}, [dispatch]);
 
-	// 			const response = await getProductAPI(); // 🟢 Đổi URL thành API của bạn
-	// 			setProducts(response); // Cập nhật state với dữ liệu từ API
-	// 			setFilteredProducts(response);
-	// 		} catch (error) {
-	// 			console.error("Error fetching products:", error);
-	// 		}
-	// 	};
-
-	// 	fetchProducts();
-	// }, []);
 	const handleViewDetails = async (orderId) => {
 		try {
 			const resultAction = await dispatch(getOrderByIdProductAPI(orderId));

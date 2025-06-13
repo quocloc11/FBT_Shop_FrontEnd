@@ -227,14 +227,14 @@ const Sales = () => {
     const fetchProducts = async () => {
       try {
         const data = await getProductAPI();
-        setProducts(data.products); // Cập nhật lại state products với dữ liệu lấy từ API
+        setProducts(data.products);
       } catch (err) {
         console.error("Lỗi khi lấy danh sách sản phẩm:", err);
       }
     };
 
-    fetchProducts(); // Gọi hàm fetchProducts khi component mount
-  }, []); // Mảng phụ thuộc rỗng, tức là chỉ gọi một lần khi component mount
+    fetchProducts();
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -249,18 +249,17 @@ const Sales = () => {
         },
       };
 
-      // Gọi API cho từng sản phẩm được chọn
       for (const productId of selectedProducts) {
-        await updatedSaleProductAPI(productId, payload); // Gửi yêu cầu cho từng sản phẩm
+        await updatedSaleProductAPI(productId, payload);
       }
       const data = await getProductAPI();
-      setProducts(data.products); // Cập nhật danh sách sản phẩm mới
-      setSelectedProducts([]); // Reset danh sách sản phẩm được chọn
-      setSalePrice(''); // Reset giá sale
-      setStartTime(dayjs()); // Reset thời gian bắt đầu
-      setEndTime(dayjs().add(1, 'hour')); // Reset thời gian kết thúc
-      setStockLimit(1); // Reset giới hạn số lượng
-      setIsActive(true); // Reset trạng thái kích hoạt
+      setProducts(data.products);
+      setSelectedProducts([]);
+      setSalePrice('');
+      setStartTime(dayjs());
+      setEndTime(dayjs().add(1, 'hour'));
+      setStockLimit(1);
+      setIsActive(true);
     } catch (error) {
       console.error("Lỗi khi tạo Flash Sale:", error);
       alert("Lỗi khi tạo Flash Sale");

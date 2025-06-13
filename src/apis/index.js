@@ -16,21 +16,6 @@ export const registerAPI = async (Data) => {
   return response.data
 }
 
-// export const getProductAPI = async ({ page, limit }) => {
-//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/products?page=${page}&limit=${limit}`)
-//   return response.data
-// }
-// export const getProductAPI = async ({ page, limit } = {}) => {
-//   let url = `${API_ROOT}/products`;
-
-//   // Nếu có truyền page và limit thì thêm query string
-//   if (page !== undefined && limit !== undefined) {
-//     url += `?page=${page}&limit=${limit}`;
-//   }
-
-//   const response = await authorizedAxiosInstance.get(url);
-//   return response.data;
-// };
 
 export const getProductAPI = async ({ page, limit, category } = {}) => {
   const params = new URLSearchParams();
@@ -116,55 +101,9 @@ export const deleteCommentsAPI = async (id, commentId) => {
   return response.data
 }
 
-// export const searchProductAPI = async (keyword) => {
-
-
-//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/products/search/${keyword}`);
-//   return response.data;
-// };
 export const searchProductAPI = async (keyword) => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/products/search/?keyword=${encodeURIComponent(keyword)}`);
   return response.data;
 };
 
-// export const createCartProductAPI = async (product) => {
-//   const response = await authorizedAxiosInstance.post(`${API_ROOT}/cart`, product)
-//   return response.data
-// }
 
-// export const getCartProductAPI = async () => {
-//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/cart`)
-//   return response.data
-// }
-
-
-// export const deleteCartProductAPI = async (id) => {
-//   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/cart/${id}`)
-//   return response.data
-// }
-
-// export const createOrderProductAPI = async (order) => {
-//   const response = await authorizedAxiosInstance.post(`${API_ROOT}/order`, order)
-//   return response.data
-// }
-
-// export const getOrderProductAPI = async () => {
-//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/order`)
-//   return response.data
-// }
-
-// export const getOrderByIdProductAPI = async (id) => {
-//   const response = await authorizedAxiosInstance.get(`${API_ROOT}/order/${id}`)
-//   return response.data
-// }
-
-// export const deleteOrderProductAPI = async (id) => {
-//   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/order/${id}`)
-//   return response.data
-// }
-
-
-// export const statusOrderProductAPI = async (id) => {
-//   const response = await authorizedAxiosInstance.patch(`${API_ROOT}/order/${id}`)
-//   return response.data
-// }

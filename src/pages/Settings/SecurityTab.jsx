@@ -23,7 +23,6 @@ function SecurityTab() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm()
   const navigate = useNavigate();
 
-  // Ôn lại: https://www.npmjs.com/package/material-ui-confirm
   const confirmChangePassword = useConfirm()
   const submitChangePassword = (data) => {
     confirmChangePassword({

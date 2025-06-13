@@ -1,4 +1,4 @@
-// Quocloc: https://youtube.com/@trungquandev
+
 import { Link, useNavigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -7,6 +7,8 @@ import LockIcon from '@mui/icons-material/Lock'
 import Typography from '@mui/material/Typography'
 import { Card as MuiCard } from '@mui/material'
 //import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
+import TrelloIcon from '../../assets/trello.svg?react';
+
 import CardActions from '@mui/material/CardActions'
 import TextField from '@mui/material/TextField'
 import Zoom from '@mui/material/Zoom'
@@ -47,7 +49,7 @@ function RegisterForm() {
             gap: 1
           }}>
             <Avatar sx={{ bgcolor: 'primary.main' }}><LockIcon /></Avatar>
-            {/* <Avatar sx={{ bgcolor: 'primary.main' }}><TrelloIcon /></Avatar> */}
+            <Avatar sx={{ bgcolor: 'primary.main' }}><TrelloIcon /></Avatar>
           </Box>
           <Box sx={{ marginTop: '1em', display: 'flex', justifyContent: 'center', color: theme => theme.palette.grey[500] }}>
             Author: Quocloc

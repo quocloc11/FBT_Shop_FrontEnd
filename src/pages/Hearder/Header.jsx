@@ -91,31 +91,7 @@ const Header = () => {
     setOpen(false);
 
   };
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const data = await getProductAPI();
-  //       setProducts(data.products); // Lưu toàn bộ sản phẩm
-  //       const uniqueCategoryMap = {};
 
-  //       data.products.forEach(product => {
-  //         const category = product.category?.trim();
-  //         if (category && !uniqueCategoryMap[category]) {
-  //           uniqueCategoryMap[category] = {
-  //             label: category,
-
-  //           };
-  //         }
-  //       });
-
-  //       setCategories(Object.values(uniqueCategoryMap)); // chỉ giữ mỗi danh mục 1 lần
-  //     } catch (err) {
-  //       console.error("Lỗi khi lấy danh sách sản phẩm:", err);
-  //     }
-  //   };
-
-  //   fetchProducts();
-  // }, []);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -177,10 +153,6 @@ const Header = () => {
     }
   };
 
-  // Xử lý khi nhấn "Search"
-  // const handleSearch = () => {
-  //   navigate(`/search?keyword=${searchQuery.trim()}`);
-  // };
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
 
@@ -542,20 +514,19 @@ const Header = () => {
         </Box>
 
         {/* Giỏ hàng */}
-        <IconButton sx={{ color: 'white' }}>
-          {token ? (
-            <Profiles />
-          ) : (
-            <Tooltip title="Đăng nhập">
-              <IconButton
-                onClick={handleLoginClick}
-                sx={{ color: "white", fontSize: 28, p: 1.2 }}
-              >
-                <AccountCircleIcon sx={{ fontSize: 45 }} />
-              </IconButton>
-            </Tooltip>
-          )}
-        </IconButton>
+        {token ? (
+          <Profiles />
+        ) : (
+          <Tooltip title="Đăng nhập">
+            <IconButton
+              onClick={handleLoginClick}
+              sx={{ color: "white", fontSize: 28, p: 1.2 }}
+            >
+              <AccountCircleIcon sx={{ fontSize: 45 }} />
+            </IconButton>
+          </Tooltip>
+        )}
+
         <Box sx={{ display: 'flex', alignItems: 'center' }}
           onClick={() => navigate(`/gio-hang`)}
         >

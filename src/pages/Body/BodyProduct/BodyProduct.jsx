@@ -46,10 +46,6 @@ const BodyProduct = () => {
     fetchProducts();
   }, []);
 
-  // const handleClickProduct = async (product) => {
-  //   await addViewProductAPI(product); // Gọi API trước
-  //   navigate(`/${slugify(product?.category)}/${slugify(product?.name)}`, { state: product }); // Sau đó chuyển trang
-  // };
   const handleClickProduct = async (product) => {
     await addViewProductAPI(product);
 

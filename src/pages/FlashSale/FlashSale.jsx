@@ -101,10 +101,6 @@ const FlashSale = () => {
     };
   };
 
-  // const handleClickProduct = async (product) => {
-  //   await addViewProductAPI(product);
-  //   navigate(`/${slugify(product.category)}/${slugify(product.name)}`, { state: product });
-  // };
   const handleClickProduct = async (product) => {
     await addViewProductAPI(product);
 

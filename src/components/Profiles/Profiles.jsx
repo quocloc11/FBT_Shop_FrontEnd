@@ -100,17 +100,20 @@ function Profiles() {
           'aria-labelledby': 'basic-button-profiles',
         }}
       >
-        <Link to='/settings/account' style={{ color: 'inherit' }}>
-          <MenuItem sx={{
+        <MenuItem
+          component={Link}
+          to="/settings/account"
+          sx={{
             '&:hover': { color: 'success.light' }
-          }}>
-            <Avatar
-              sx={{ width: 28, height: 28, mr: 2 }}
-              alt='quocloc'
-            // src={currentUser?.avatar}
-            /> Profile
-          </MenuItem>
-        </Link>
+          }}
+        >
+          <Avatar
+            sx={{ width: 28, height: 28, mr: 2 }}
+            alt='quocloc'
+          />
+          Profile
+        </MenuItem>
+
         <Divider />
         <MenuItem >
           <ListItemIcon>

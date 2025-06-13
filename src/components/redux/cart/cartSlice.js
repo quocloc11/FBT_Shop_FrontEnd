@@ -16,7 +16,7 @@ export const createCartProductAPI = createAsyncThunk(
   async (product, { rejectWithValue }) => {
     try {
       const response = await authorizedAxiosInstance.post(`${API_ROOT}/cart`, product);
-      console.log("🚀 Tạo giỏ hàng trả về:", response.data);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng');

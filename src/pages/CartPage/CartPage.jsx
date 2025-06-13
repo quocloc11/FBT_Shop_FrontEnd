@@ -90,41 +90,6 @@ const CartPage = () => {
     : 0;
 
   const totalDiscount = totalOriginal - total;
-  // const handleConfirmOrder = async (order) => {
-  //   if (!paymentMethod) {
-  //     toast.error("Vui lòng chọn phương thức thanh toán!");
-  //     return; // Dừng việc gửi đơn hàng nếu chưa chọn phương thức thanh toán
-  //   }
-
-  //   try {
-  //     // Thêm thông tin phương thức thanh toán vào đơn hàng
-  //     const orderWithPayment = { ...order, paymentMethod };
-
-  //     // Bắt đầu tạo đơn hàng
-  //     const action = await dispatch(createOrderProductAPI(orderWithPayment)); // Gọi API tạo đơn hàng và đợi kết quả
-
-  //     if (action.type === 'orders/createOrderProductAPI/fulfilled') {
-  //       const orderId = action.payload._id;
-
-  //       // Xóa giỏ hàng
-  //       await Promise.all(cartItems.map(item => dispatch(deleteCartProductAPI(item.productId))));
-  //       dispatch(clearCart());
-
-  //       // Fetch lại đơn hàng mới nhất từ server
-  //       await dispatch(getOrderProductAPI()); // ✅ Thêm dòng này để cập nhật lại danh sách orders
-
-  //       toast.success("Đơn hàng đặt thành công!");
-  //       navigate(`/order-success?order_id=${orderId}`);
-
-  //     } else {
-  //       // Xử lý khi action thất bại
-  //       toast.error("Đặt hàng thất bại!"); // Thông báo thất bại
-  //     }
-  //   } catch (err) {
-  //     // Xử lý lỗi khi có lỗi xảy ra trong quá trình tạo đơn hàng hoặc xóa sản phẩm
-  //     toast.error("Lỗi khi đặt hàng: " + (err.response?.data?.message || err.message));
-  //   }
-  // };
 
   const handleConfirmOrder = async (order) => {
     if (!paymentMethod) {
@@ -215,11 +180,7 @@ const CartPage = () => {
                           <Box flex={1}>
 
                             <Typography fontWeight="bold">{item.name}</Typography>
-                            {/* {item.promotion && (
-    <Typography variant="body2" color="success.main" mt={1}>
-      Ưu đãi: {item.promotion}
-    </Typography>
-  )} */}
+
                             {item.originalPrice && item.originalPrice > item.price && (
                               <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
                                 {Number(item.originalPrice).toLocaleString('vi-VN')} đ

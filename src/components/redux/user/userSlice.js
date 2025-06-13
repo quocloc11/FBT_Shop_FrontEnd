@@ -121,7 +121,6 @@ export const userSlice = createSlice({
       state.users = state.users.map(user => user._id === updatedUser._id ? updatedUser : user);
       state.filteredUsers = state.filteredUsers.map(user => user._id === updatedUser._id ? updatedUser : user);
 
-      // ⚠️ Cập nhật currentUser nếu người dùng đang đăng nhập chính là người vừa được sửa
       if (state.currentUser && state.currentUser._id === updatedUser._id) {
         state.currentUser = updatedUser;
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
@@ -135,7 +134,6 @@ export const userSlice = createSlice({
 
     });
 
-    // 🆕 Delete User (Soft Delete)
     builder.addCase(deleteUserAPI.fulfilled, (state, action) => {
       const { userId } = action.payload
 

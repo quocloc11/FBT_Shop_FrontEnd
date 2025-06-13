@@ -3,8 +3,8 @@ import { API_ROOT } from '../../../utils/constants';
 import authorizedAxiosInstance from '../../../utils/authorizeAxios';
 
 const initialState = {
-  products: [],            // mảng nhiều sản phẩm
-  currentProduct: null,    // sản phẩm hiện tại (nếu có)
+  products: [],
+  currentProduct: null,
   loading: false
 }
 
