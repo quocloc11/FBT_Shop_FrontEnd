@@ -554,7 +554,7 @@ const Header = () => {
       </Box>
 
       {/* Dòng sản phẩm hot */}
-      <Box sx={{ mb: 1, ml: "360px" }}>
+      <Box sx={{ mb: 1, ml: "380px" }}>
         <ul className="text-truncate flex w-full items-center gap-x-3 overflow-auto scrollbar-none">
           {["iphone 16", "Laptop", "Apple watch", "Samsung", "Carseat", "Robot hút bụi", "Quạt điều hòa"].map((text, i) => (
             <li key={i}>
