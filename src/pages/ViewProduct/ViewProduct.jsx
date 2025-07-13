@@ -1,4 +1,3 @@
-
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -22,7 +21,6 @@ export default function ViewedProducts() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        //const resoponse=dispatch(getProductAPI())
         const response = await viewProductAPI();
         setProducts(response.data);
       } catch (error) {
@@ -37,7 +35,8 @@ export default function ViewedProducts() {
     <Box sx={{
       maxWidth: '1200px',
       mx: 'auto',
-      px: 2,
+      px: { xs: 1, sm: 2, md: 4 },
+
       py: 4,
       pb: 4,
       border: '1px solid #e0e0e0',
@@ -62,16 +61,37 @@ export default function ViewedProducts() {
       <Swiper
         modules={[Navigation]}
         spaceBetween={20}
-        slidesPerView={5}
         navigation
         pagination={{ clickable: true }}
+        breakpoints={{
+          0: {
+            slidesPerView: 1.3,
+            spaceBetween: 10,
+          },
+          480: {
+            slidesPerView: 2,
+            spaceBetween: 15,
+          },
+          768: {
+            slidesPerView: 3,
+            spaceBetween: 15,
+          },
+          992: {
+            slidesPerView: 4,
+            spaceBetween: 20,
+          },
+          1200: {
+            slidesPerView: 5,
+            spaceBetween: 20,
+          },
+        }}
       >
+
         {Array.isArray(products) && products.length > 0 ? (
           products.map((item, index) => {
             const product = item?.product;
             if (!product) return null;
 
-            // Tính số tiền giảm
             const discountAmount = product?.price - product?.discountPrice;
 
             return (
@@ -104,14 +124,15 @@ export default function ViewedProducts() {
                   }}
 
                 >
-                  <img
-                    src={product?.images?.length > 0 ? product.images : 'https://via.placeholder.com/150'}
-                    alt={product?.name || 'Sản phẩm'}
+                  <Box
+                    component="img"
+                    src={product?.images}
+                    alt={product?.name}
                     loading="lazy"
-                    style={{
+                    sx={{
                       width: '100%',
-                      height: '160px',
                       objectFit: 'contain',
+                      height: { xs: '120px', sm: '140px', md: '160px' },
                     }}
                   />
 
@@ -119,8 +140,6 @@ export default function ViewedProducts() {
                     <Typography variant="subtitle1" fontWeight="600">
                       {product?.name || 'Không tên'}
                     </Typography>
-
-
 
                     {product?.discountPrice && product?.discountPrice < product?.price ? (
                       <>
@@ -141,7 +160,6 @@ export default function ViewedProducts() {
                         </Typography>
                       </>
                     ) : (
-                      // Nếu không giảm giá, hiển thị giá gốc
                       <Typography variant="h6" color="black">
                         {Number(product.price).toLocaleString("vi-VN")} đ
                       </Typography>

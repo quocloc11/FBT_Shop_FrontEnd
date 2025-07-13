@@ -7,18 +7,6 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Profiles from "../../components/Profiles/Profiles";
 import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
-import TvIcon from "@mui/icons-material/Tv";
-import LocalLaundryServiceIcon from "@mui/icons-material/LocalLaundryService";
-import ComputerIcon from "@mui/icons-material/Computer";
-import ToysIcon from "@mui/icons-material/Toys";
-import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
-import PrintIcon from "@mui/icons-material/Print";
-import KitchenIcon from "@mui/icons-material/Kitchen";
-import PowerIcon from "@mui/icons-material/Power";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import slugify from 'slugify';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,22 +22,6 @@ import { selectOrders } from "../../components/redux/order/orderSlice";
 import { selectCartItems } from "../../components/redux/cart/cartSlice";
 import { getProductAPI, searchProductAPI } from "../../apis";
 import { LaptopIcon } from "lucide-react";
-// const categories = [
-//   { icon: <TvIcon />, label: "Tivi, Tủ lạnh, Máy lạnh - Điều hòa" },
-//   { icon: <LocalLaundryServiceIcon />, label: "Máy giặt, Máy sấy, Tủ sấy" },
-//   { icon: <ComputerIcon />, label: "PC, Màn hình, Đồng hồ, Máy tính bảng" },
-//   { icon: <ToysIcon />, label: "Quạt, Quạt điều hòa, Máy lọc nước" },
-//   { icon: <CleaningServicesIcon />, label: "Robot hút bụi, Máy hút bụi" },
-//   { icon: <PrintIcon />, label: "Máy in, Phần mềm, Linh kiện" },
-//   { icon: <KitchenIcon />, label: "Ấm siêu tốc, Nồi cơm điện" },
-//   { icon: <PowerIcon />, label: "Điện gia dụng, Máy ép" },
-//   { icon: <RestaurantIcon />, label: "Thiết bị bếp, Nồi, Chảo" },
-//   { icon: <LocalFireDepartmentIcon />, label: "Hút ẩm, Máy sưởi" },
-//   { icon: <FavoriteIcon />, label: "Chăm sóc sức khỏe" },
-//   { icon: <CameraAltIcon />, label: "Camera, Thiết bị mạng" },
-// ];
-
-
 
 const Header = () => {
   const [categories, setCategories] = useState([]);
@@ -87,9 +59,7 @@ const Header = () => {
 
   const handleMouseLeave = () => {
     setIsHovering(false);
-
     setOpen(false);
-
   };
 
   useEffect(() => {
@@ -106,7 +76,7 @@ const Header = () => {
             const mapItem = categoryMap[categoryKey] || {};
             uniqueCategoryMap[categoryKey] = {
               value: categoryKey,
-              label: mapItem.label || categoryKey, // fallback nếu không có trong map
+              label: mapItem.label || categoryKey,
               icon: mapItem.icon || <HeadphonesIcon />
             };
           }
@@ -123,29 +93,23 @@ const Header = () => {
 
   const filteredProducts = products.filter(p => p.category === hoveredCategory);
 
-  //const cartCount = 4;
   const navigate = useNavigate();
-  // Hiển thị menu khi di chuột vào
 
-  // Xử lý khi người dùng thay đổi ô tìm kiếm
   const handleInputChange = (e) => {
     const keyword = e.target.value;
     setSearchQuery(keyword);
 
-    // Nếu có từ khóa, bắt đầu tìm kiếm gợi ý
     if (keyword) {
       fetchSearchSuggestions(keyword);
     } else {
-      setSuggestions([]); // Nếu không có từ khóa, xóa gợi ý
+      setSuggestions([]);
     }
   };
 
-  // Hàm tìm kiếm sản phẩm gợi ý
   const fetchSearchSuggestions = async (keyword) => {
     setLoading(true);
     try {
-      const result = await searchProductAPI(keyword); // Gọi API tìm kiếm sản phẩm
-      setSuggestions(result.products); // Giả sử kết quả trả về là một mảng sản phẩm gợi ý
+      const result = await searchProductAPI(keyword);
     } catch (error) {
       console.error('Lỗi khi tìm kiếm sản phẩm:', error);
     } finally {
@@ -156,12 +120,10 @@ const Header = () => {
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
 
-    // Lưu lịch sử (tối đa 5 mục, không trùng lặp)
     const updatedHistory = [searchQuery, ...searchHistory.filter(q => q !== searchQuery)].slice(0, 5);
     localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
     setSearchHistory(updatedHistory);
     navigate(`/search?keyword=${searchQuery.trim()}`);
-    // Gọi API tìm kiếm sản phẩm nếu cần
   };
   const handleDeleteHistoryItem = (itemToDelete) => {
     console.log("Deleting: ", itemToDelete);
@@ -170,11 +132,8 @@ const Header = () => {
     localStorage.setItem("searchHistory", JSON.stringify(updatedHistory));
   };
 
-
-
-
   const groupedProducts = filteredProducts.reduce((acc, product) => {
-    const brand = product.brand || "Unknown"; // Nếu không có thương hiệu thì cho là "Unknown"
+    const brand = product.brand || "Unknown";
     if (!acc[brand]) {
       acc[brand] = [];
     }
@@ -186,17 +145,111 @@ const Header = () => {
     navigate("/login");
   };
   return (
-    <Box sx={{ backgroundColor: '#cb1c22', color: 'white', px: 8, py: 1, position: 'relative' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <Box
+      sx={{
+        backgroundColor: '#cb1c22',
+        color: 'white',
+        px: { xs: 2, sm: 4, md: 6, lg: 8 },
+        py: 1,
+        position: 'relative',
+      }}
+    >
+
+      <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
         {/* Logo */}
-        <Box sx={{ display: 'flex', alignItems: 'center', cursor: "pointer", mr: 4 }}
+        <Box
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        >
+          <img
+            src="https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/small/fptshop_logo_c5ac91ae46.png"
+            alt="FPT Shop"
+            style={{ height: '40px' }}
+          />
+        </Box>
+
+        {/* Giỏ hàng */}
+        <Box onClick={() => navigate(`/gio-hang`)}>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: 'black',
+              color: 'white',
+              borderRadius: '30px',
+              minHeight: '40px',
+              px: 2,
+              '&:hover': {
+                transform: 'scale(1.05)',
+              },
+            }}
+          >
+            <Badge badgeContent={cartCount} color="error">
+              <ShoppingCart />
+            </Badge>
+          </Button>
+        </Box>
+      </Box>
+      {/* Thanh tìm kiếm cho MOBILE */}
+      <Box
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          width: '100%',
+          mt: 1,
+        }}
+      >
+        <TextField
+          autoComplete="off"
+          value={searchQuery}
+          onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSearch();
+          }}
+          placeholder="Tìm sản phẩm..."
+          variant="outlined"
+          fullWidth
+          sx={{
+            backgroundColor: 'white',
+            borderRadius: '50px',
+            '& fieldset': { border: 'none' },
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleSearch}>
+                  <Search />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+
+      <Box sx={{
+        display: { xs: 'none', sm: 'flex' },
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        rowGap: 1
+      }}>
+
+
+        {/* Logo */}
+        <Box sx={{ display: 'flex', alignItems: 'center', cursor: "pointer", mr: { xs: 1, sm: 2, md: 4 } }}
           onClick={() => navigate("/")}
         >
           <img src="https://cdn2.fptshop.com.vn/unsafe/360x0/filters:quality(100)/small/fptshop_logo_c5ac91ae46.png" alt="FPT Shop" style={{ height: '40px' }} />
         </Box>
 
         {/* Danh mục và Tìm kiếm */}
-        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, position: 'relative' }}>
+        <Box
+          sx={{
+            display: { xs: 'none', sm: 'flex' },
+            alignItems: 'center',
+            flexGrow: 1,
+            position: 'relative'
+          }}
+        >
+
           <Box
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -259,7 +312,6 @@ const Header = () => {
                     ))}
 
                   </List>
-
                 </Box>
 
                 {/* Gợi ý cho bạn */}
@@ -270,7 +322,7 @@ const Header = () => {
                       color: "black",
                       boxShadow: 3,
                       padding: 2,
-                      width: "min(calc(100vw - 330px), 800px)",
+                      width: { xs: '90vw', sm: 'calc(100vw - 330px)', md: 800 },
                       minWidth: 250,
 
                       maxHeight: 600,
@@ -279,9 +331,6 @@ const Header = () => {
                       fontSize: '0.85rem'
                     }}
                   >
-
-
-                    {/* Nhóm sản phẩm theo thương hiệu */}
                     <Grid container spacing={4}>
                       {filteredProducts.length === 0 ? (
                         <Grid item xs={12}>
@@ -335,7 +384,6 @@ const Header = () => {
           </Box>
 
 
-          {/* Thanh tìm kiếm */}
           <Box
             sx={{
               position: 'relative',
@@ -343,10 +391,10 @@ const Header = () => {
               flexDirection: 'column',
               //alignItems: 'center',
               alignItems: 'stretch',
-              width: '100%',         // ✅ Cho phép chiếm toàn bộ chiều ngang cha
-              maxWidth: '600px',     // ✅ Giới hạn nếu cần (hoặc bỏ nếu muốn full 100%)
-              px: 2,                 // ✅ Thêm padding ngang nếu cần
-              mx: 'auto'             // ✅ Căn giữa nếu dùng trong container lớn
+              width: '100%',
+              maxWidth: { xs: '100%', sm: '500px', md: '600px' },
+              px: { xs: 1, sm: 2 },
+              mx: 'auto',
             }}
           >
             {/* Thanh tìm kiếm */}
@@ -358,14 +406,14 @@ const Header = () => {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSearch();
               }}
-              onFocus={() => setShowDropdown(true)}  // Hiển thị dropdown khi focus vào ô tìm kiếm
-              onBlur={() => setTimeout(() => setShowDropdown(false), 100)}  // Đảm bảo dropdown ẩn đi sau một khoảng thời gian (để không bị ẩn ngay khi click)
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 100)}
               placeholder="Nhập tên sản phẩm..."
               variant="outlined"
               sx={{
                 backgroundColor: 'white',
-                width: '100%', // không cố định, sẽ chiếm theo cha
-                maxWidth: '600px', // giới hạn tối đa, tránh quá to
+                width: '100%',
+                maxWidth: '600px',
                 transition: 'all 0.3s ease',
                 borderRadius: '50px',
 
@@ -399,7 +447,6 @@ const Header = () => {
               }}
             />
 
-            {/* Hiển thị danh sách gợi ý */}
             {showDropdown && (suggestions.length > 0 || searchHistory.length > 0) && (
               <div style={{
                 position: 'absolute',
@@ -461,7 +508,6 @@ const Header = () => {
                       );
                     })
                   ) : (
-                    // phần searchHistory giữ nguyên như bạn đã viết
                     searchHistory.map((item, index) => (
                       <li
                         key={index}
@@ -502,29 +548,28 @@ const Header = () => {
                       </li>
                     ))
                   )}
-
-
                 </ul>
               </div>
             )}
           </Box>
-
-
-
         </Box>
 
         {/* Giỏ hàng */}
         {token ? (
-          <Profiles />
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <Profiles />
+          </Box>
         ) : (
-          <Tooltip title="Đăng nhập">
-            <IconButton
-              onClick={handleLoginClick}
-              sx={{ color: "white", fontSize: 28, p: 1.2 }}
-            >
-              <AccountCircleIcon sx={{ fontSize: 45 }} />
-            </IconButton>
-          </Tooltip>
+          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <Tooltip title="Đăng nhập">
+              <IconButton
+                onClick={handleLoginClick}
+                sx={{ color: "white", fontSize: 28, p: 1.2 }}
+              >
+                <AccountCircleIcon sx={{ fontSize: 45 }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         )}
 
         <Box sx={{ display: 'flex', alignItems: 'center' }}
@@ -544,7 +589,6 @@ const Header = () => {
               }
             }}
           >
-            {/* <ShoppingCart sx={{ mr: 1 }} /> Giỏ hàng */}
             <Badge badgeContent={cartCount} color="error">
               <ShoppingCart />
             </Badge>
@@ -553,9 +597,17 @@ const Header = () => {
         </Box>
       </Box>
 
-      {/* Dòng sản phẩm hot */}
-      <Box sx={{ mb: 1, ml: "380px" }}>
-        <ul className="text-truncate flex w-full items-center gap-x-3 overflow-auto scrollbar-none">
+      <Box
+        sx={{
+          display: { xs: 'none', md: 'flex' },
+          justifyContent: 'center',
+          mb: 1,
+          px: { xs: 1, sm: 3, md: 5 },
+          mx: 'auto',
+          width: '100%',
+        }}
+      >
+        <ul className="text-truncate flex w-full items-center gap-x-3 overflow-auto scrollbar-none" style={{ justifyContent: 'center' }}>
           {["iphone 16", "Laptop", "Apple watch", "Samsung", "Carseat", "Robot hút bụi", "Quạt điều hòa"].map((text, i) => (
             <li key={i}>
               <span className="text-link whitespace-nowrap text-white b2-regular">{text}</span>
@@ -563,6 +615,7 @@ const Header = () => {
           ))}
         </ul>
       </Box>
+
     </Box>
   );
 

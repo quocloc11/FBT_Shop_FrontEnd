@@ -11,12 +11,11 @@ import ProductsTable from "../../components/AdminDashBoard/products/ProductsTabl
 import { getProductAPI } from '../../apis/index.js';
 
 const ProductsPage = () => {
-	const [totalProducts, setTotalProducts] = useState(0); // State cho Total Products
-	const [topSelling, setTopSelling] = useState(0); // State cho Top Selling
-	const [lowStock, setLowStock] = useState(0); // State cho Low Stock
-	const [totalRevenue, setTotalRevenue] = useState("$0"); // State cho Total Revenue
+	const [totalProducts, setTotalProducts] = useState(0);
+	const [topSelling, setTopSelling] = useState(0);
+	const [lowStock, setLowStock] = useState(0);
+	const [totalRevenue, setTotalRevenue] = useState("$0");
 
-	// Hàm gọi API để lấy thông tin thống kê
 	const fetchStatistics = async () => {
 		try {
 			const response = await getProductAPI()
@@ -26,15 +25,15 @@ const ProductsPage = () => {
 			const total = products.reduce((sum, product) => sum + (product.price || 0), 0);
 			const formattedRevenue = `$${total.toLocaleString()}`;
 
-			setTotalProducts(totalItems); // ✅ Tổng số sản phẩm từ API
+			setTotalProducts(totalItems);
 
 			setTotalRevenue(formattedRevenue);
 
 			const topSellingCount = products
-				.filter(p => typeof p.sold === 'number') // đảm bảo có trường sold
+				.filter(p => typeof p.sold === 'number')
 				.sort((a, b) => b.sold - a.sold)
 				.slice(0, 3)
-				.reduce((sum, p) => sum + p.sold, 0); // tính tổng sold của top 3
+				.reduce((sum, p) => sum + p.sold, 0);
 
 			setTopSelling(topSellingCount);
 
@@ -45,7 +44,6 @@ const ProductsPage = () => {
 		}
 	};
 
-	// Gọi hàm fetchStatistics khi component được mount
 	useEffect(() => {
 		fetchStatistics();
 	}, []);

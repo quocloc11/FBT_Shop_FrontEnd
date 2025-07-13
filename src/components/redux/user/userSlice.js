@@ -5,11 +5,10 @@ import { toast } from 'react-toastify';
 
 const initialState = {
   currentUser: JSON.parse(localStorage.getItem('currentUser')) || null,
-  users: [],  // Đảm bảo rằng 'users' được khởi tạo là một mảng rỗng
-  filteredUsers: [], // Khởi tạo filteredUsers là mảng rỗng
-  isLoading: false, // Thêm isLoading để xử lý trạng thái tải
+  users: [],
+  filteredUsers: [],
+  isLoading: false,
 }
-
 
 export const loginAPI = createAsyncThunk(
   'user/loginUserAPI',
@@ -68,7 +67,6 @@ export const deleteUserAPI = createAsyncThunk(
   }
 )
 
-
 export const fetchAllUsers = createAsyncThunk(
   'users/fetchAll',
   async ({ role, limit, skip } = {}, { rejectWithValue }) => {
@@ -100,24 +98,23 @@ export const userSlice = createSlice({
     })
     builder.addCase(updateUserAPI.fulfilled, (state, action) => {
       const user = action.payload
-      state.currentUser = { ...user } // ✅ tạo object mới
+      state.currentUser = { ...user }
       localStorage.setItem('currentUser', JSON.stringify(user))
     })
     builder.addCase(fetchAllUsers.fulfilled, (state, action) => {
       state.isLoading = false
-      state.users = action.payload // Lưu tất cả người dùng vào 'users'
-      state.filteredUsers = action.payload // Cập nhật filteredUsers
+      state.users = action.payload
+      state.filteredUsers = action.payload
     })
     builder.addCase(fetchAllUsers.pending, (state) => {
-      state.isLoading = true // Đánh dấu trạng thái đang tải
+      state.isLoading = true
     })
     builder.addCase(fetchAllUsers.rejected, (state) => {
-      state.isLoading = false // Dừng trạng thái tải khi có lỗi
+      state.isLoading = false
     })
     builder.addCase(editUserAPI.fulfilled, (state, action) => {
       const updatedUser = action.payload;
 
-      // Cập nhật trong danh sách users và filteredUsers
       state.users = state.users.map(user => user._id === updatedUser._id ? updatedUser : user);
       state.filteredUsers = state.filteredUsers.map(user => user._id === updatedUser._id ? updatedUser : user);
 
@@ -131,7 +128,6 @@ export const userSlice = createSlice({
           toast.info('Your role has changed. Please login again.');
         }
       }
-
     });
 
     builder.addCase(deleteUserAPI.fulfilled, (state, action) => {
@@ -142,7 +138,7 @@ export const userSlice = createSlice({
       state.filteredUsers = state.filteredUsers.filter(user => user._id !== userId)
       if (state.currentUser && state.currentUser._id === userId) {
         state.currentUser = null;
-        localStorage.removeItem('currentUser'); // Xóa dữ liệu người dùng khỏi localStorage
+        localStorage.removeItem('currentUser');
         console.log("Current user logged out and removed from localStorage.");
       }
       console.log("After removing user, state.users:", state.users);
@@ -150,7 +146,6 @@ export const userSlice = createSlice({
   }
 })
 
-// Action creators are generated for each case reducer function
 export const selectCurrentUser = (state) => {
   return state.user.currentUser
 }

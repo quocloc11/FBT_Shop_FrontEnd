@@ -6,13 +6,11 @@ import Avatar from '@mui/material/Avatar'
 import LockIcon from '@mui/icons-material/Lock'
 import Typography from '@mui/material/Typography'
 import { Card as MuiCard } from '@mui/material'
-//import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import TrelloIcon from '../../assets/trello.svg?react';
 
 import CardActions from '@mui/material/CardActions'
 import TextField from '@mui/material/TextField'
 import Zoom from '@mui/material/Zoom'
-//import { registerUserAPI } from '~/apis'
 import {
   EMAIL_RULE,
   PASSWORD_RULE,
@@ -20,7 +18,6 @@ import {
   PASSWORD_RULE_MESSAGE,
   EMAIL_RULE_MESSAGE
 } from '../../utils/validators.js'
-//import FieldErrorAlert from '~/components/Form/FieldErrorAlert'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { registerAPI } from '../../apis/index.js'
@@ -57,7 +54,6 @@ function RegisterForm() {
           <Box sx={{ padding: '0 1em 1em 1em' }}>
             <Box sx={{ marginTop: '1em' }}>
               <TextField
-                // autoComplete="nope"
                 autoFocus
                 fullWidth
                 label="Enter Email..."
@@ -72,7 +68,6 @@ function RegisterForm() {
                   }
                 })}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'email'} /> */}
             </Box>
             <Box sx={{ marginTop: '1em' }}>
               <TextField
@@ -89,7 +84,6 @@ function RegisterForm() {
                   }
                 })}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'password'} /> */}
             </Box>
             <Box sx={{ marginTop: '1em' }}>
               <TextField
@@ -105,7 +99,6 @@ function RegisterForm() {
                   }
                 })}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'password_confirmation'} /> */}
             </Box>
           </Box>
           <CardActions sx={{ padding: '0 1em 1em 1em' }}>

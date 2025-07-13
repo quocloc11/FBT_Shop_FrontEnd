@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Grid, Card, CardMedia, Typography, Button, Box } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useNavigate } from "react-router-dom"; // Import hook điều hướng
+import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -31,18 +31,18 @@ const banners = [
 
 const slugify = (str) =>
   str
-    .replace(/Đ/g, "D")               // xử lý Đ
-    .replace(/đ/g, "d")               // xử lý đ
+    .replace(/Đ/g, "D")
+    .replace(/đ/g, "d")
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")  // bỏ dấu
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/\s+/g, "-")             // space -> -
-    .replace(/[^\w-]+/g, "")          // bỏ ký tự đặc biệt
-    .replace(/--+/g, "-")             // bỏ gạch ngang dư
-    .replace(/^-+|-+$/g, "");         // bỏ gạch đầu/cuối
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 const Body = () => {
-  const navigate = useNavigate(); // Hook điều hướng
+  const navigate = useNavigate();
   return (
     <Container maxWidth="lg">
       <Swiper
@@ -75,8 +75,8 @@ const Body = () => {
           gap: 3,
           overflowX: "auto",
           py: 4,
-          scrollbarWidth: "none", // ẩn thanh cuộn với Firefox
-          '&::-webkit-scrollbar': { display: 'none' } // ẩn thanh cuộn với Chrome
+          scrollbarWidth: "none",
+          '&::-webkit-scrollbar': { display: 'none' }
         }}
       >
         {categories.map((category, index) => (

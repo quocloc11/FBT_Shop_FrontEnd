@@ -5,8 +5,8 @@ const PrivateRoute = ({ children, allowedRoles = [] }) => {
   const token = useSelector(state => state?.user?.currentUser?.accessToken)
   const role = useSelector(state => state?.user?.currentUser?.role);
 
-  console.log('Token:', token);  // Debug token
-  console.log('Role:', role);    // Debug role
+  console.log('Token:', token);
+  console.log('Role:', role);
 
   if (!token) {
     return <Navigate to="/login" replace />

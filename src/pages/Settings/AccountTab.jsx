@@ -24,11 +24,9 @@ function AccountTab() {
   const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
 
-  // Những thông tin của user để init vào form (key tương ứng với register phía dưới Field)
   const initialGeneralForm = {
     displayName: currentUser?.displayName
   }
-  // Sử dụng defaultValues để set giá trị mặc định cho các field cần thiết
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: initialGeneralForm
   })
@@ -37,10 +35,7 @@ function AccountTab() {
     const { displayName } = data
     console.log('displayName', displayName)
 
-    // Nếu không có sự thay đổi gì về displayname thì không làm gì cả
     if (displayName === currentUser?.displayName) return
-
-    // Gọi API...
 
     toast.promise(
       dispatch(updateUserAPI({ displayName })),
@@ -53,7 +48,6 @@ function AccountTab() {
   }
 
   const uploadAvatar = (e) => {
-    // Lấy file thông qua e.target?.files[0] và validate nó trước khi xử lý
     console.log('e.target?.files[0]: ', e.target?.files[0])
     const error = singleFileValidator(e.target?.files[0])
     if (error) {
@@ -61,7 +55,6 @@ function AccountTab() {
       return
     }
 
-    // Sử dụng FormData để xử lý dữ liệu liên quan tới file khi gọi API
     let reqData = new FormData()
     reqData.append('avatar', e.target?.files[0])
 

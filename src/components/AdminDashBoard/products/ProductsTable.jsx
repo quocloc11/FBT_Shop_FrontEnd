@@ -3,9 +3,6 @@ import { Edit, Search, Trash2, PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createProductAPI, deleteAProductAPI, getProductAPI } from "../../../apis";
 import EditProduct from "./EditProduct/EditProduct";
-import Modal from 'react-modal';  // import thư viện modal (hoặc sử dụng modal của bạn)
-// import { getProductAPI } from "../../redux/product/productSlice";
-import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
 const ProductsTable = () => {
@@ -13,8 +10,8 @@ const ProductsTable = () => {
 	const [products, setProducts] = useState([]);
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
-	const [showDeleteModal, setShowDeleteModal] = useState(false); // Trạng thái modal
-	const [productToDelete, setProductToDelete] = useState(null);  // Sản phẩm đang được xóa
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [productToDelete, setProductToDelete] = useState(null);
 	const [currentProduct, setCurrentProduct] = useState(null);
 	const [newProduct, setNewProduct] = useState({
 		name: "",
@@ -29,10 +26,8 @@ const ProductsTable = () => {
 		images: "",
 		brand: "",
 		discountPrice: 0
-		//	flashSale: false
 	});
 
-	// Gọi API để lấy danh sách sản phẩm	
 	useEffect(() => {
 		const fetchProducts = async () => {
 			try {
@@ -40,7 +35,7 @@ const ProductsTable = () => {
 				const response = await getProductAPI();
 				console.log('Fetched products:', response.products);
 
-				setProducts(response.products); // Cập nhật state với dữ liệu từ API
+				setProducts(response.products);
 			} catch (error) {
 				console.error("Error fetching products:", error);
 			}
@@ -54,35 +49,28 @@ const ProductsTable = () => {
 		try {
 			const formData = new FormData();
 
-			// Thêm các trường văn bản
 			for (const key in newProduct) {
 				if (key !== "images") {
 					formData.append(key, newProduct[key]);
 				}
 			}
 
-			// Thêm các file ảnh
 			if (newProduct.images && newProduct.images.length > 0) {
 				Array.from(newProduct.images).forEach((file) => {
 					formData.append("images", file);
 				});
 			}
 
-			// Gửi FormData đến API
-			const response = await createProductAPI(formData); // Đảm bảo hàm này sử dụng axios và không stringify dữ liệu
+			const response = await createProductAPI(formData);
 
-			// Kiểm tra nếu API trả về dữ liệu thành công
 			const product = response.data || response;
 
 			if (product && product._id) {
-				// const updatedProducts = [...products, response.data];
-				// setProducts(updatedProducts);
 				setProducts((prevProducts) => [...prevProducts, product]);
 				toast.success("Tạo sản phẩm thành công!");
 
 				setShowCreateModal(false);
 
-				// Reset form
 				setNewProduct({
 					name: "",
 					category: "",
@@ -96,7 +84,6 @@ const ProductsTable = () => {
 					discountPrice: 0,
 					brand: "",
 					images: [],
-					//	flashSale: false
 				});
 			} else {
 				console.error("API response invalid:", response);
@@ -108,8 +95,8 @@ const ProductsTable = () => {
 
 
 	const handleCancelDelete = () => {
-		setShowDeleteModal(false);  // Đóng modal nếu không xóa
-		setProductToDelete(null);  // Reset sản phẩm cần xóa
+		setShowDeleteModal(false);
+		setProductToDelete(null);
 	};
 	const handleEditProduct = (product) => {
 		setCurrentProduct(product);
@@ -118,23 +105,19 @@ const ProductsTable = () => {
 
 
 	const handleDeleteClick = (id) => {
-		// Hiển thị modal xác nhận xóa
 		setProductToDelete(id);
 		setShowDeleteModal(true);
 	};
 
 	const handleDeleteProduct = async () => {
 		try {
-			// Gọi API xóa sản phẩm
 			const deletedProduct = await deleteAProductAPI(productToDelete);
 
-			// Kiểm tra nếu sản phẩm xóa thành công, cập nhật lại danh sách sản phẩm
 			const updatedProducts = products.filter(p => p._id !== productToDelete);
 			setProducts(updatedProducts);
 
-			// Đóng modal sau khi xóa thành công
 			setShowDeleteModal(false);
-			setProductToDelete(null);  // Reset sản phẩm cần xóa
+			setProductToDelete(null);
 
 			console.log('Product deleted successfully:', deletedProduct);
 		} catch (error) {
@@ -208,8 +191,6 @@ const ProductsTable = () => {
 									{product?.name}
 								</td>
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product?.category}</td>
-								{/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.quantity}</td>
-								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{product.promotion}</td>  */}
 								<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
 									{product?.price.toFixed(2)} đ
 								</td>
@@ -238,7 +219,6 @@ const ProductsTable = () => {
 					</tbody>
 				</table>
 			</div>
-			{/* Modal xác nhận xóa */}
 			{showDeleteModal && productToDelete && (
 				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
 					<div className="bg-gray-800 p-6 rounded-xl shadow-lg w-[30rem] max-h-[50vh] overflow-auto">
@@ -331,7 +311,7 @@ const ProductsTable = () => {
 										{newProduct.images.map((image, index) => (
 											<div key={index} className="w-24 h-24">
 												<img
-													src={URL.createObjectURL(image)} // Generate object URL for each image
+													src={URL.createObjectURL(image)}
 													alt={`Preview ${index}`}
 													className="w-full h-full object-cover rounded-lg"
 												/>
@@ -372,9 +352,6 @@ const ProductsTable = () => {
 					</div>
 				</div>
 			)}
-
-
-
 			{/* Modal for Editing a Product */}
 
 			<EditProduct
@@ -382,7 +359,6 @@ const ProductsTable = () => {
 				showEditModal={showEditModal}
 				currentProduct={currentProduct}
 				setCurrentProduct={setCurrentProduct}
-				//handleUpdateProduct={handleUpdateProduct}
 				setProducts={setProducts}
 				products={products}
 			/>

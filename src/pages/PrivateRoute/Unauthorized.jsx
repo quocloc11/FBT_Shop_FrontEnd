@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Unauthorized = () => {
   const navigate = useNavigate();
-
   const handleBackToHome = () => {
-    navigate('/');  // Điều hướng đến trang chủ
+    navigate('/');
   };
 
   return (

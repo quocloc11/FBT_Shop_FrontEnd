@@ -1,11 +1,9 @@
-// Import thư viện
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import HomeIcon from '@mui/icons-material/Home';
 import { Link } from 'react-router-dom';
 
-// Import hình ảnh và SVG
 import particles from '../../assets/404/particles.png';
 import PlanetSvg from '../../assets/404/planet.svg';
 import AstronautSvg from '../../assets/404/astronaut.svg';

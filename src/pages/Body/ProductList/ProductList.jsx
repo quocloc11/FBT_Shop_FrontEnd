@@ -21,7 +21,6 @@ import { addViewProductAPI, getProductAPI } from "../../../apis";
 import slugify from 'slugify';
 import { Pagination as MuiPagination } from '@mui/material';
 
-
 const banners = [
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
   "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:quality(100)/H1_1440x242_f002f904d9.png",
@@ -39,7 +38,7 @@ const ProductList = () => {
   const [selectedPrices, setSelectedPrices] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Số sản phẩm mỗi trang
+  const itemsPerPage = 8;
 
   const [totalPages, setTotalPages] = useState(1);
 
@@ -54,7 +53,7 @@ const ProductList = () => {
         const response = await getProductAPI({
           page: currentPage,
           limit: itemsPerPage,
-          category: selectedCategory // ← truyền từ URL hoặc state
+          category: selectedCategory
         });
 
         setProducts(response.products);
@@ -84,15 +83,14 @@ const ProductList = () => {
     const value = event.target.value;
 
     if (value === "all") {
-      // Nếu chọn "Tất cả", bỏ chọn tất cả các filter khác
       setSelectedPrices([]);
       return;
     }
 
     setSelectedPrices((prev) =>
       prev.includes(value)
-        ? prev.filter((v) => v !== value) // Bỏ chọn nếu đã có
-        : [...prev.filter((v) => v !== "all"), value] // Thêm mới
+        ? prev.filter((v) => v !== value)
+        : [...prev.filter((v) => v !== "all"), value]
     );
   };
   const uniqueBrands = [...new Set(products.map((product) => product.brand))];
@@ -117,7 +115,7 @@ const ProductList = () => {
     .sort((a, b) => {
       if (sortBy === "priceAsc") return a.price - b.price;
       if (sortBy === "priceDesc") return b.price - a.price;
-      return 0; // mặc định không sắp xếp
+      return 0;
     });
 
 
@@ -151,7 +149,6 @@ const ProductList = () => {
 
         <Breadcrumbs aria-label="breadcrumb" sx={{ mt: 2 }}>
           <Link component={RouterLink} to="/" underline="hover">Trang chủ</Link>
-          {/* <Typography color="textPrimary">{products?.category}</Typography> */}
           <Link color="textPrimary">{product?.category}</Link>
 
         </Breadcrumbs>
@@ -175,7 +172,6 @@ const ProductList = () => {
           slidesPerView={1}
           navigation
           pagination={{ clickable: true }}
-          //autoplay={{ delay: 4000, disableOnInteraction: false }}
           loop={true}
           style={{ width: "100%", paddingTop: "40px", paddingBottom: "40px" }}
 
@@ -194,7 +190,15 @@ const ProductList = () => {
 
         <Grid container spacing={2}>
           <Grid item xs={12} md={3}>
-            <Box sx={{ width: 250, padding: 2, border: '1px solid #ccc', borderRadius: 2 }}>
+            <Box
+              sx={{
+                width: { xs: '100%', md: 250 },
+                padding: 2,
+                border: '1px solid #ccc',
+                borderRadius: 2,
+                boxSizing: 'border-box',
+              }}
+            >
               <Typography variant="h6" gutterBottom>
                 Bộ lọc tìm kiếm
               </Typography>
@@ -218,9 +222,6 @@ const ProductList = () => {
                   label={option.label}
                 />
               ))}
-
-
-
               <Typography gutterBottom mt={2}>
                 Hoặc nhập khoảng giá phù hợp với bạn:
               </Typography>
@@ -259,12 +260,11 @@ const ProductList = () => {
                 alignItems: 'center',
                 py: 2,
                 px: 2,
-                backgroundColor: '#f9fafb', // màu nền nhẹ giống ảnh
+                backgroundColor: '#f9fafb',
                 borderRadius: 2,
               }}
             >
-              {/* Lọc nhanh */}
-              <FormControl sx={{ minWidth: 200 }}>
+              <FormControl sx={{ minWidth: 200, display: { xs: 'none', sm: 'none', md: 'block' } }}>
                 <InputLabel>Hãng Sản Xuất:</InputLabel>
                 <Select
                   value={selectedBrand}
@@ -282,7 +282,6 @@ const ProductList = () => {
 
             </Box>
             <Box sx={{ mb: 2 }}>
-              {/* Thanh lọc và sắp xếp */}
               <Box
                 sx={{
                   display: 'flex',
@@ -294,13 +293,10 @@ const ProductList = () => {
                   borderRadius: 2,
                 }}
               >
-
-                {/* Dòng thông báo kết quả */}
                 <Typography sx={{ mt: 2, ml: 1 }}>
                   Tìm thấy <strong>{filteredProducts.length}</strong> kết quả
                 </Typography>
 
-                {/* Sắp xếp */}
                 <FormControl sx={{ minWidth: 200 }}>
                   <InputLabel>Sắp xếp theo</InputLabel>
                   <Select
@@ -314,27 +310,22 @@ const ProductList = () => {
                   </Select>
                 </FormControl>
               </Box>
-
-
             </Box>
-
-
             <Grid container spacing={2}>
               {filteredProducts.map((product) => (
-                <Grid item xs={12} sm={6} md={3} key={product.id}>
+                <Grid item xs={6} sm={6} md={3} key={product.id}>
                   <StyledCard
                     onClick={() => handleClickProduct(product)}
                     sx={{
                       cursor: "pointer",
-                      border: "1px solid #e0e0e0", // Thêm dòng này để có border
-                      borderRadius: "8px", // Tuỳ chọn bo góc nếu muốn
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "8px",
                       transition: "box-shadow 0.3s ease-in-out",
                       "&:hover": {
                         boxShadow: 3,
                       },
                     }}
                   >
-
                     <CardMedia
                       component="img"
                       image={product.images}
@@ -350,13 +341,9 @@ const ProductList = () => {
                         },
                       }}
                     />
-
                     <CardContent>
                       {product.discountPrice && product.discountPrice < product.price ? (
                         <>
-
-
-                          {/* Giá gốc */}
                           <Typography
                             variant="body2"
                             sx={{
@@ -366,7 +353,6 @@ const ProductList = () => {
                           >
                             {Number(product.price).toLocaleString("vi-VN")} đ
                           </Typography>
-                          {/* Giá đã giảm */}
                           <Typography
                             variant="h6"
                             sx={{
@@ -378,7 +364,6 @@ const ProductList = () => {
                           >
                             {Number(product.price - product.discountPrice).toLocaleString("vi-VN")} đ
                           </Typography>
-                          {/* Phần giảm giá (VD: -2.000.000 đ) */}
                           <Typography
                             variant="body2"
                             color="success.main"
@@ -389,7 +374,6 @@ const ProductList = () => {
                           </Typography>
                         </>
                       ) : (
-                        // Nếu không giảm giá, chỉ hiển thị giá gốc
                         <Typography
                           variant="h6"
                           sx={{
@@ -412,8 +396,6 @@ const ProductList = () => {
                 </Grid>
               ))}
             </Grid>
-
-
           </Grid>
         </Grid>
 
@@ -425,9 +407,6 @@ const ProductList = () => {
             color="primary"
           />
         </Box>
-
-
-
       </Container >
       <Footer />
     </>

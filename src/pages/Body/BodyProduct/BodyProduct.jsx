@@ -10,15 +10,11 @@ import "swiper/css/navigation";
 import { useNavigate } from "react-router-dom";
 import { getProductAPI } from "../../../apis";
 import slugify from "slugify";
-//import { getProductAPI } from "../../../components/redux/product/productSlice";
 import { addViewProductAPI } from "../../../apis";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { createCartProductAPI, getCartProductAPI } from "../../../components/redux/cart/cartSlice";
 
-
-
-// Styled Component
 const StyledCard = styled(Card)({
   boxShadow: "none",
   borderRadius: "10px",
@@ -35,9 +31,7 @@ const BodyProduct = () => {
     const fetchProducts = async () => {
       try {
         const response = await getProductAPI();
-        // console.log('response', response)
         setProduct(response.products);
-        //setProduct(response)
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -63,8 +57,8 @@ const BodyProduct = () => {
   };
 
   return (
-    <Box sx={{ background: "#ffffff", py: 4, px: 9 }}>
-      {/* Khối màu hồng nổi bên trong */}
+    <Box sx={{ background: "#ffffff", py: 4, px: { xs: 2, md: 9 } }}>
+
       <Box
         sx={{
           backgroundImage: 'url("https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/Background_gia_online_D_9b239b2ffc.png")',
@@ -93,15 +87,35 @@ const BodyProduct = () => {
           Giá tốt. Nhanh tay. Số lượng ít!
         </Typography>
 
-
         <Swiper
-          slidesPerView={5}
           spaceBetween={15}
-          pagination={{ clickable: true }}
           navigation
           modules={[SwiperGrid, Navigation, Autoplay]}
           className="mySwiper"
+          breakpoints={{
+            0: {
+              slidesPerView: 1.5,
+              spaceBetween: 10,
+            },
+            480: {
+              slidesPerView: 2,
+              spaceBetween: 10,
+            },
+            768: {
+              slidesPerView: 3,
+              spaceBetween: 15,
+            },
+            992: {
+              slidesPerView: 4,
+              spaceBetween: 15,
+            },
+            1200: {
+              slidesPerView: 5,
+              spaceBetween: 15,
+            },
+          }}
         >
+
           {product?.map((product, index) => (
             <SwiperSlide key={index}>
               <StyledCard
@@ -127,9 +141,6 @@ const BodyProduct = () => {
                 <CardContent>
                   {product.discountPrice && product.discountPrice < product.price ? (
                     <>
-
-
-                      {/* Giá gốc */}
                       <Typography
                         variant="body2"
                         sx={{
@@ -139,7 +150,6 @@ const BodyProduct = () => {
                       >
                         {Number(product.price).toLocaleString("vi-VN")} đ
                       </Typography>
-                      {/* Giá đã giảm */}
                       <Typography
                         variant="h6"
                         sx={{
@@ -151,7 +161,6 @@ const BodyProduct = () => {
                       >
                         {Number(product.price - product.discountPrice).toLocaleString("vi-VN")} đ
                       </Typography>
-                      {/* Phần giảm giá (VD: -2.000.000 đ) */}
                       <Typography
                         variant="body2"
                         color="success.main"
@@ -162,7 +171,6 @@ const BodyProduct = () => {
                       </Typography>
                     </>
                   ) : (
-                    // Nếu không giảm giá, chỉ hiển thị giá gốc
                     <Typography
                       variant="h6"
                       sx={{
@@ -183,14 +191,6 @@ const BodyProduct = () => {
 
               </StyledCard>
               <Box display="flex" justifyContent="center" mt={1}>
-                {/* <Button
-                  variant="contained"
-                  size="small"
-                  sx={{ background: "#f50057" }}
-                  onClick={() => handleCartProduct(product)}
-                >
-                  Mua ngay
-                </Button> */}
               </Box>
             </SwiperSlide>
           ))}

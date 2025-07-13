@@ -3,13 +3,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authorizedAxiosInstance from '../../../utils/authorizeAxios';
 import { API_ROOT } from '../../../utils/constants';
 
-// Initial state
 const initialState = {
   orders: [],
 };
 
-
-// Thêm các thunks (hành động bất đồng bộ)
 export const createOrderProductAPI = createAsyncThunk(
   'orders/createOrderProductAPI',
   async (order, { rejectWithValue }) => {
@@ -60,10 +57,10 @@ export const deleteOrderProductAPI = createAsyncThunk(
 
 export const statusOrderProductAPI = createAsyncThunk(
   'orders/statusOrderProductAPI',
-  async ({ id, status }, { rejectWithValue }) => {  // Nhận cả id và status
+  async ({ id, status }, { rejectWithValue }) => {
     try {
       const response = await authorizedAxiosInstance.patch(`${API_ROOT}/order/${id}/status`, {
-        status,  // Gửi status trong body request
+        status,
       });
       return response.data;
     } catch (error) {
@@ -72,10 +69,6 @@ export const statusOrderProductAPI = createAsyncThunk(
   }
 );
 
-
-
-
-// Slice
 export const orderSlice = createSlice({
   name: 'orders',
   initialState,

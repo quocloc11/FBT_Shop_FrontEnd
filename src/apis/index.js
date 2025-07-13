@@ -1,21 +1,9 @@
 import { API_ROOT } from '../utils/constants.js'
 import authorizedAxiosInstance from '../utils/authorizeAxios.js'
-
-// export const fetchBoardDetailsAPI = async (boardId) => {
-//   const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
-//   return response.data
-// }
-
-// export const loginAPI = async (Data) => {
-//   const response = await authorizedAxiosInstance.post(`${API_ROOT}/users/login`, Data)
-//   return response.data
-// }
-
 export const registerAPI = async (Data) => {
   const response = await authorizedAxiosInstance.post(`${API_ROOT}/users/register`, Data)
   return response.data
 }
-
 
 export const getProductAPI = async ({ page, limit, category } = {}) => {
   const params = new URLSearchParams();
@@ -40,8 +28,6 @@ export const updatedProductAPI = async (id, productData) => {
   const response = await authorizedAxiosInstance.put(`${API_ROOT}/products/${id}`, productData)
   return response.data
 }
-
-
 
 export const deleteAProductAPI = async (id) => {
   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/products/${id}`)
@@ -68,8 +54,6 @@ export const getSaleProductAPI = async () => {
   return response.data
 }
 
-
-
 export const deleteSaleAProductAPI = async (id) => {
   const response = await authorizedAxiosInstance.delete(`${API_ROOT}/flash-sales/${id}`)
   return response.data
@@ -84,8 +68,6 @@ export const viewProductAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/viewed-products`)
   return response.data
 }
-
-
 
 export const addCommentsAPI = async (id, Data) => {
   const response = await authorizedAxiosInstance.post(`${API_ROOT}/comments/${id}`, Data)

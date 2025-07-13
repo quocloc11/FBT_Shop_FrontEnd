@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { VITE_BACKEND_URL } from "../App";
 import { getProductAPI, updatedProductAPI } from "../apis";
-//import { getProductAPI } from "../components/redux/product/productSlice";
 
 
 const EditPage = () => {
@@ -23,14 +22,12 @@ const EditPage = () => {
         setIsLoading(true);
         try {
             const response = await getProductAPI(id);
-            console.log("API Response:", response); // Debug API response
+            console.log("API Response:", response);
 
-            // Kiểm tra nếu response không có dữ liệu hoặc mảng rỗng
             if (!response || response.length === 0) {
                 throw new Error("No product data found");
             }
 
-            // Lấy phần tử đầu tiên từ mảng
             const productData = response[0];
 
             setProduct({
@@ -50,7 +47,7 @@ const EditPage = () => {
         if (id) {
             getProduct();
         }
-    }, [id]); // Thêm id vào dependency để tránh lỗi khi id thay đổi
+    }, [id]);
 
 
     const updateProduct = async (e) => {

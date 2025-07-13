@@ -29,7 +29,7 @@ const Chatbot = () => {
 
       {open && (
         <Paper sx={{ p: 2, width: 300 }}>
-          <Typography variant="h6" color="primary">💙 Điện Máy XANH</Typography>
+          <Typography variant="h6" color="primary">Điện Máy XANH</Typography>
           {messages.map((msg, index) => (
             <Typography key={index} sx={{ textAlign: msg.sender === "bot" ? "left" : "right" }}>
               {msg.text}

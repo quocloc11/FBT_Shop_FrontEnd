@@ -1,4 +1,3 @@
-// pages/OrderSuccess.jsx
 import { Typography, Container, Button } from "@mui/material";
 import { useSearchParams, useNavigate } from "react-router-dom";
 

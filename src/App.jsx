@@ -27,15 +27,12 @@ import SearchPage from "./pages/SearchPage/SearchPage.jsx";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import Unauthorized from "./pages/PrivateRoute/Unauthorized.jsx";
 
-// import Sidebar from "./components/AdminDashBoard/common/Sidebar.jsx";
 
 export const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const App = () => {
   const token = useSelector(state => state.user.currentUser?.accessToken);
-  // console.log('token', token)
   return (
-
 
     <div >
       <ToastContainer
@@ -61,7 +58,6 @@ const App = () => {
         <Route path="/order-success" element={<OrderSuccess />} />
         <Route path="/search" element={<SearchPage />} />
 
-        {/* onClick={() => navigate(`/${slugify(category.name)}`)} */}
         <Route path='/:category/:slug' element={<DetailProduct />} />
         <Route path='/gio-hang' element={<CartPage />} />
 
@@ -69,7 +65,6 @@ const App = () => {
         <Route path='/settings/security' element={<Settings />} />
 
 
-        {/* <Sidebar /> */}
         {/* Admin */}
         <Route
           path="/dashboard"

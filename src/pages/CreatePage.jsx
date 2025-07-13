@@ -14,21 +14,17 @@ const CreatePage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    // Xử lý thay đổi input
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Nếu là quantity hoặc price, chuyển sang kiểu số
         const newValue = name === "quantity" || name === "price" ? Number(value) : value;
         setFormData({ ...formData, [name]: newValue });
     };
 
-    // Lưu sản phẩm
     const saveProduct = async (e) => {
         e.preventDefault();
         const { name, quantity, price, image } = formData;
 
-        // Kiểm tra dữ liệu đầu vào
         if (!name || !quantity || !price || !image) {
             toast.error("Please fill out all input fields completely");
             return;
@@ -38,8 +34,8 @@ const CreatePage = () => {
             setIsLoading(true);
             const payload = {
                 name,
-                quantity: Number(quantity), // Chắc chắn là số
-                price: Number(price), // Chắc chắn là số
+                quantity: Number(quantity),
+                price: Number(price),
                 image
             };
             const response = await createProductAPI(payload);

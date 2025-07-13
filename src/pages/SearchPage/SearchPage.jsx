@@ -59,9 +59,6 @@ const SearchPage = () => {
     fetchData();
   }, [searchQuery]);
 
-
-
-
   const handleSortChange = (event) => {
     setSortBy(event.target.value);
   };
@@ -78,8 +75,6 @@ const SearchPage = () => {
       setSelectedPrices((prev) => prev.filter((item) => item !== value));
     }
   };
-
-
 
   const priceOptions = [
     { label: "Tất cả", value: "all" },
@@ -106,12 +101,10 @@ const SearchPage = () => {
     const applyFiltersAndSorting = () => {
       let products = [...originalProducts];
 
-      // Lọc theo khoảng giá
       products = products.filter(
         (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
       );
 
-      // Lọc theo các mức giá đã chọn
       if (selectedPrices.length > 0) {
         products = products.filter((product) => {
           return selectedPrices.some((range) => {
@@ -138,15 +131,10 @@ const SearchPage = () => {
 
   return (
     <>
-
       <Header />
-
 
       <Container>
         <CategoryMenu />
-
-
-
         <Grid container spacing={2}>
           <Grid item xs={12} md={3}>
             <Box sx={{ padding: 2, border: "1px solid #ccc", borderRadius: 2 }}>
@@ -213,13 +201,12 @@ const SearchPage = () => {
                 </Select>
               </FormControl>
             </Box>
-            {/* Hiển thị số lượng sản phẩm tìm thấy */}
             <Typography variant="h6" sx={{ m: 2 }}>
               Tìm thấy  <strong>{filteredProducts.length}</strong> kết quả với từ khoá <strong>{searchQuery}</strong>
             </Typography>
             <Grid container spacing={2}>
               {filteredProducts.map((product) => (
-                <Grid item xs={12} sm={6} md={3} key={product.id}>
+                <Grid item xs={6} sm={6} md={3} key={product.id}>
                   <Card
                     onClick={() => handleClickProduct(product)}
                     sx={{

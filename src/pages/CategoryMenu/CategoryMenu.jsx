@@ -20,21 +20,26 @@ const CategoryMenu = () => {
         backgroundColor: "#fff",
 
         display: "grid",
-        //  boxShadow: 1,
         px: 8,
       }}
     >
-      <Stack direction="row" spacing={2}>
+      <Stack
+        direction="row"
+        spacing={2}
+        sx={{
+          display: { xs: 'none', sm: 'flex' }
+        }}
+      >
         {categories.map((item, index) => (
           <Box
             key={index}
             sx={{
               display: "flex",
-              flexDirection: "row", // Căn ảnh và chữ nằm ngang
-              alignItems: "center", // Canh giữa theo chiều dọc
-              minWidth: 150, // Đảm bảo đủ rộng để ảnh và chữ không bị chồng lên nhau
+              flexDirection: "row",
+              alignItems: "center",
+              minWidth: 150,
               textAlign: "left",
-              gap: 1, // Tạo khoảng cách giữa ảnh và chữ
+              gap: 1,
             }}
           >
             <img
@@ -46,6 +51,7 @@ const CategoryMenu = () => {
           </Box>
         ))}
       </Stack>
+
     </Box>
   );
 };

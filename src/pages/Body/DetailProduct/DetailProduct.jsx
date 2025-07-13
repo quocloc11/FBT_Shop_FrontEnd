@@ -28,25 +28,22 @@ const DetailProduct = () => {
   const [newRating, setNewRating] = useState(0);
   const dispatch = useDispatch();
 
-  //const currentUser = useSelector((state) => state.user.currentUser);
   const currentUser = useSelector(selectCurrentUser)
   console.log('currentUser', currentUser)
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const data = await getCommentsAPI(product._id); // Lấy bình luận từ API bằng product._id
-        console.log('comments:', data);
-        setReviews(Array.isArray(data) ? data : []); // Giả sử data là một mảng bình luận
+        const data = await getCommentsAPI(product._id);
+        setReviews(Array.isArray(data) ? data : [])
       } catch (error) {
         console.error('Lỗi khi lấy bình luận:', error);
       }
     };
 
     if (product._id) {
-      fetchComments(); // Gọi API khi có product._id
+      fetchComments();
     }
-  }, [product._id]); // Chạy lại khi product._id thay đổi
-
+  }, [product._id]);
   const handleSubmit = async () => {
     if (!newReview || newRating === 0) {
       alert("Vui lòng nhập nội dung và đánh giá!");
@@ -54,23 +51,19 @@ const DetailProduct = () => {
     }
 
     try {
-      // Gửi bình luận mới qua API
       const newCommentData = {
-        productId: product._id, // Sử dụng ID của sản phẩm
-        userId: currentUser.id, // Lấy userId từ Redux store
-        username: currentUser.email, // Lấy username từ Redux store
+        productId: product._id,
+        userId: currentUser.id,
+        username: currentUser.email,
         content: newReview,
         rating: newRating,
       };
 
-      // Gửi bình luận qua API
       const response = await addCommentsAPI(product._id, newCommentData);
       console.log("Bình luận đã gửi:", response);
 
-      // Cập nhật lại danh sách bình luận
-      setReviews((prevReviews) => [...prevReviews, response]); // Giả sử response là bình luận mới được trả về từ API
+      setReviews((prevReviews) => [...prevReviews, response]);
 
-      // Reset lại form nhập bình luận
       setNewReview('');
       setNewRating(0);
     } catch (error) {
@@ -87,7 +80,6 @@ const DetailProduct = () => {
         ? product.price - product.discountPrice
         : product.price;
 
-    // Lọc ra các thuộc tính cần thiết
     const productData = {
       productId: product._id,
       quantity: 1,
@@ -110,10 +102,6 @@ const DetailProduct = () => {
       });
   };
 
-  // const avgRating =
-  //   reviews.length > 0
-  //     ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length
-  //     : 0;
   const reviewComments = reviews.filter(r => r.rating !== undefined && r.rating !== null);
   const avgRating = reviewComments.length > 0
     ? reviewComments.reduce((sum, r) => sum + r.rating, 0) / reviewComments.length
@@ -133,7 +121,6 @@ const DetailProduct = () => {
           <Typography color="text.primary">Iphone 16</Typography>
         </Breadcrumbs>
 
-        {/* Phần chính */}
         <Grid container spacing={4}>
           {/* Hình ảnh */}
           <Grid item xs={12} md={6}>
@@ -144,9 +131,9 @@ const DetailProduct = () => {
                 alt="Samsung Galaxy S24 FE"
                 sx={{
                   height: 400,
-                  objectFit: "contain", // Hoặc 'cover' nếu bạn muốn căng hết
+                  objectFit: "contain",
                   width: "100%",
-                  backgroundColor: "#f5f5f5", // nền sáng cho ảnh rõ hơn
+                  backgroundColor: "#f5f5f5",
                   borderRadius: 2,
                 }}
               />
@@ -165,7 +152,6 @@ const DetailProduct = () => {
             </Box>
           </Grid>
 
-          {/* Thông tin sản phẩm */}
           <Grid item xs={12} md={6}>
             <Typography variant="h5" fontWeight="bold" gutterBottom>{product.name}</Typography>
             <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mb={1}>
@@ -196,9 +182,6 @@ const DetailProduct = () => {
               />
             </Box>
 
-
-
-            {/* Giá */}
             <Box mt={3}>
               <Typography sx={{ textDecoration: "line-through", color: "text.secondary" }}>
                 {Number(product.price).toLocaleString("vi-VN")} đ
@@ -208,7 +191,6 @@ const DetailProduct = () => {
               </Typography>
             </Box>
 
-            {/* Mua ngay */}
             <Box mt={4}>
               <Button
                 variant="contained"
@@ -221,7 +203,6 @@ const DetailProduct = () => {
               </Button>
             </Box>
 
-            {/* Khuyến mãi */}
             <Box mt={4}>
               <Button variant="outlined" color="primary" size="small">
                 Khuyến mãi nổi bật
@@ -235,12 +216,9 @@ const DetailProduct = () => {
 
         <Box sx={{ border: "1px solid", borderColor: "grey.300", borderRadius: 2 }}>
 
-          {/* Thông số kỹ thuật */}
           <Grid container spacing={3} mt={5}>
-            {/* Cột bên trái: Thông số + Mô tả */}
             <Grid item xs={12} sm={6} md={8}>
               <Grid container spacing={3}>
-                {/* Thông số nổi bật */}
                 <Grid item xs={12}>
                   <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
                     <Typography variant="h6" fontWeight="bold">Thông số nổi bật</Typography>
@@ -250,7 +228,6 @@ const DetailProduct = () => {
                   </Paper>
                 </Grid>
 
-                {/* Mô tả sản phẩm */}
                 <Grid item xs={12}>
                   <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
                     <Typography variant="h6" fontWeight="bold">Mô tả sản phẩm</Typography>
@@ -260,7 +237,6 @@ const DetailProduct = () => {
               </Grid>
             </Grid>
 
-            {/* Cột bên phải: Video */}
             <Grid item xs={12} sm={6} md={4}>
               <Card sx={{ p: 2, borderRadius: 2, height: '100%' }}>
                 <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>Video Sản phẩm</Typography>
@@ -270,12 +246,11 @@ const DetailProduct = () => {
           </Grid>
 
         </Box>
-        {/* Bình luận */}
         <Box
           sx={{
-            width: "100%",             // Chiếm toàn bộ chiều ngang
-            maxWidth: "1200px",        // Tùy kích thước bạn muốn, ví dụ 1200px
-            mx: "auto",                // Căn giữa
+            width: "100%",
+            maxWidth: "1200px",
+            mx: "auto",
             mt: 6,
             p: 3,
             bgcolor: "background.paper",
@@ -283,7 +258,6 @@ const DetailProduct = () => {
             boxShadow: 2,
           }}
         >
-          {/* Tổng quan */}
           <Typography variant="h5" fontWeight="bold" gutterBottom>
             Khách hàng nói gì về sản phẩm
           </Typography>
@@ -300,7 +274,6 @@ const DetailProduct = () => {
 
           <Divider sx={{ my: 3 }} />
 
-          {/* Viết bình luận */}
           <Box mb={4}>
             <Typography variant="h6" gutterBottom>
               Viết bình luận của bạn
@@ -319,10 +292,9 @@ const DetailProduct = () => {
             <Rating
               name="rating"
               value={newRating}
-              onChange={(e, newValue) => setNewRating(newValue || 0)} // Nếu không có giá trị, đặt là 0
+              onChange={(e, newValue) => setNewRating(newValue || 0)}
               size="large"
             />
-
 
             <Button
               variant="contained"
@@ -335,7 +307,6 @@ const DetailProduct = () => {
 
           <Divider sx={{ mb: 3 }} />
 
-          {/* Danh sách bình luận */}
           <Grid container spacing={2}>
             {Array.isArray(reviews) &&
               reviews.map((review, index) => (
@@ -371,7 +342,6 @@ const DetailProduct = () => {
       </Container>
 
       <Footer />
-
 
     </>
   );

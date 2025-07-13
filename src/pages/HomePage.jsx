@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux"; // thêm
+import { useDispatch, useSelector } from "react-redux";
 
 import Header from "./Hearder/Header";
 import Body from "./Body/Body";
@@ -41,7 +41,7 @@ const HomePage = () => {
         if (token) {
             dispatch(getCartProductAPI());
         }
-    }, [token, dispatch]); // Gọi cart API mỗi khi user thay đổi hoặc dispatch mới
+    }, [token, dispatch]);
 
     return (
         <>

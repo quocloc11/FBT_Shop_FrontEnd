@@ -41,22 +41,17 @@ const StyledCard = styled(Card)({
   position: 'relative',
   padding: '10px',
   borderRadius: '10px',
-  // border: '1px solid #ccc', // Viền nhẹ bên trong
-  //boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
   transition: 'transform 0.3s ease-in-out',
   '&:hover': {
-    //transform: 'scale(1.05)',
-    //boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
   },
 });
 
 const StyledCardMedia = styled(CardMedia)({
-  transition: 'transform 0.3s ease-in-out', // Hiệu ứng cho CardMedia
+  transition: 'transform 0.3s ease-in-out',
   '&:hover': {
-    transform: 'scale(1.1)', // Phóng to hình ảnh khi hover vào Card
+    transform: 'scale(1.1)',
   },
 });
-// Main Component
 const FlashSale = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -65,13 +60,11 @@ const FlashSale = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [now, setNow] = useState(new Date());
 
-  // Update current time every second
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -116,13 +109,13 @@ const FlashSale = () => {
   };
 
   const handleAddToCart = (product) => {
-    const originalPrice = product.price;  // Giá gốc
-    const discountPrice = originalPrice * (1 - product.flashSale.discountPercent / 100);  // Giá đã giảm
+    const originalPrice = product.price;
+    const discountPrice = originalPrice * (1 - product.flashSale.discountPercent / 100);
 
     const cartItem = {
       productId: product._id,
       quantity: 1,
-      price: discountPrice,  // Sử dụng giá giảm
+      price: discountPrice,
       name: product.name,
       images: product.images,
       originalPrice: product.price,
@@ -140,8 +133,6 @@ const FlashSale = () => {
       });
   };
 
-
-  // Filter products by flash sale status
   const filteredProducts = products.filter(p => {
     if (!p.flashSale) return false;
     const start = new Date(p.flashSale.saleStart);
@@ -155,15 +146,15 @@ const FlashSale = () => {
   return (
     <Box
       sx={{
-        p: 1,
-        //  backgroundColor: "#f5f5f5",
-        border: '1px solid red',
-        maxWidth: '1200px',   // hoặc 'lg'
-        mx: 'auto',            // căn giữa
+        px: { xs: 1, sm: 2, md: 4 },
+        py: { xs: 2, sm: 3 },
+        maxWidth: '1200px',
+        mx: 'auto',
         borderRadius: '12px',
         backgroundColor: "rgb(251, 211, 179)",
       }}
     >
+
       <Box sx={{
         textAlign: "center",
         mb: 3,
@@ -181,7 +172,6 @@ const FlashSale = () => {
         />
       </Box>
 
-
       <Tabs value={tabIndex} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 3 }}>
         <Tab label="Đang diễn ra" />
         <Tab label="Sắp diễn ra" />
@@ -189,43 +179,64 @@ const FlashSale = () => {
       </Tabs>
 
       <Swiper
-        slidesPerView={4}
         spaceBetween={30}
-        pagination={{ clickable: true }}
         navigation
+        pagination={{ clickable: true }}
         autoplay={{ delay: 3000 }}
         modules={[SwiperGrid, Navigation, Autoplay]}
         className="mySwiper"
+        breakpoints={{
+          0: {
+            slidesPerView: 1.2,
+            spaceBetween: 12,
+          },
+          576: {
+            slidesPerView: 2,
+            spaceBetween: 15,
+          },
+          768: {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          992: {
+            slidesPerView: 4,
+            spaceBetween: 24,
+          },
+          1200: {
+            slidesPerView: 4,
+            spaceBetween: 30,
+          },
+        }}
       >
+
         {filteredProducts.map((p, index) => {
           const start = new Date(p.flashSale.saleStart);
           const end = new Date(p.flashSale.saleEnd);
 
           let saleStatus = 'Đã kết thúc';
-          let showBuyButton = true; // Biến để kiểm tra khi nào hiển thị nút "Mua giá sốc"
+          let showBuyButton = true;
 
           if (now < start) {
             const { days, hours, minutes, seconds } = getTimeLeft(start);
             saleStatus = `Sắp diễn ra: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-            showBuyButton = false; // Không hiển thị nút "Mua giá sốc" khi sản phẩm sắp diễn ra
+            showBuyButton = false;
           } else if (now >= start && now <= end) {
             const { days, hours, minutes, seconds } = getTimeLeft(end);
             saleStatus = `Còn lại: ${days}d ${hours}h ${minutes}m ${seconds}s`;
           }
 
-          // Tính giá sau giảm
-          const originalPrice = p.price;  // Giá gốc
-          const discountPrice = originalPrice * (1 - p.flashSale.discountPercent / 100);  // Giá đã giảm
+          const originalPrice = p.price;
+          const discountPrice = originalPrice * (1 - p.flashSale.discountPercent / 100)
 
           return (
             <SwiperSlide key={index}>
               <Box
                 sx={{
-                  border: '2px solid red',      // Border đỏ bên ngoài
+                  border: '2px solid red',
                   borderRadius: '12px',
                   padding: '1px',
                   margin: '1px',
-                  height: '412px',            // Khoảng cách giữa các slide
+                  minHeight: 420,
                   backgroundColor: '#fff',
                   boxSizing: 'border-box',
                 }}
@@ -247,19 +258,19 @@ const FlashSale = () => {
                     component="img"
                     image={p.images}
                     alt={p.name}
-                    sx={{ height: 180, objectFit: "contain", p: 1 }}
+                    sx={{
+                      height: { xs: 120, sm: 140, md: 180 },
+                      objectFit: "contain",
+                      p: 1,
+                    }}
                   />
+
                   <CardContent sx={{ textAlign: "center" }}>
                     <Typography fontWeight="bold">{p.name}</Typography>
 
-
-
-                    {/* Hiển thị giá gốc với dấu gạch ngang */}
                     <Typography sx={{ textDecoration: "line-through", color: "#888" }}>
                       {originalPrice.toLocaleString("vi-VN")} đ
                     </Typography>
-                    {/* <Typography sx={{ color: "orange", mb: 1 }}>{p.flashSale.discountPercent}% giảm</Typography> */}
-                    {/* Hiển thị giá sau giảm */}
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
                       <Typography
                         color="error"
@@ -282,14 +293,12 @@ const FlashSale = () => {
                       </Typography>
                     </Box>
 
-                    {/* 🔥 Thêm dòng này để hiển thị số lượng */}
                     <Typography sx={{ color: "green", fontWeight: "bold" }}>
                       Còn lại: {p.quantity} sản phẩm
                     </Typography>
 
                     <CountdownBox>{saleStatus}</CountdownBox>
 
-                    {/* Hiển thị thông báo "Sắp diễn ra" thay cho nút "Mua giá sốc" */}
                     {!showBuyButton && (
                       <Button
                         variant="contained"
@@ -303,7 +312,6 @@ const FlashSale = () => {
                       </Button>
                     )}
 
-                    {/* Hiển thị nút "Mua giá sốc" chỉ khi sản phẩm đang trong thời gian flash sale */}
                     {showBuyButton && (
                       <Button
                         variant="contained"

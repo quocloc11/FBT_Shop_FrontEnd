@@ -7,11 +7,10 @@ import { productReducer } from './product/productSlice';
 import { orderReducer } from './order/orderSlice';
 import { cartReducer } from './cart/cartSlice';
 
-// Persist config CHỈ CHO 'user'
 const userPersistConfig = {
   key: 'user',
   storage,
-  whitelist: ['token'] // hoặc thêm 'info' nếu cần
+  whitelist: ['token']
 };
 
 const cartPersistConfig = {
@@ -20,7 +19,6 @@ const cartPersistConfig = {
   whitelist: ['carts']
 };
 
-// Gộp reducer lại
 const rootReducer = combineReducers({
   user: persistReducer(userPersistConfig, userReducer),
   product: productReducer,

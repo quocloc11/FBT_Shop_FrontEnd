@@ -4,8 +4,6 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, currentProduct, setCurrentProduct }) => {
-  // console.log('products', products)
-
   const [imagePreview, setImagePreview] = useState([]);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -27,10 +25,9 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
     if (currentProduct) {
       setNewProduct({
         ...currentProduct,
-        images: [] // reset để phân biệt giữa ảnh cũ và ảnh mới
+        images: []
       });
 
-      // Nếu currentProduct.images là mảng URL ảnh:
       if (Array.isArray(currentProduct.images)) {
         setImagePreview(currentProduct.images);
       } else {
@@ -76,11 +73,9 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
 
 
 
-  // Hàm xử lý thay đổi giá trị của trường
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Chuyển các trường price, stock, quantity thành số
     if (name === "price" || name === "discountPrice" || name === "stock" || name === "quantity") {
       const numericValue = value === "" ? 0 : parseFloat(value);
       setNewProduct((prev) => ({ ...prev, [name]: numericValue }));
@@ -104,7 +99,7 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleUpdateProduct(newProduct); // Gửi dữ liệu mới để cập nhật
+              handleUpdateProduct(newProduct);
             }}
             className="space-y-4"
           >
@@ -131,7 +126,7 @@ const EditProduct = ({ setShowEditModal, products, setProducts, showEditModal, c
                 <select
                   className="w-full p-2 mt-1 bg-gray-700 text-gray-300 rounded-lg border border-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                   value={newProduct.category || ""}
-                  //   onChange={handleInputChange}
+
                   onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
                   required
                 >

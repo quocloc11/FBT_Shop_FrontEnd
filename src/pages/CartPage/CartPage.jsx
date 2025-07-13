@@ -13,7 +13,6 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import Header from '../Hearder/Header';
 import CategoryMenu from '../CategoryMenu/CategoryMenu';
-//import { deleteCartProductAPI, getCartProductAPI } from '../../apis';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import ViewedProducts from '../ViewProduct/ViewProduct';
@@ -33,14 +32,12 @@ const CartPage = () => {
   const [loadingOrder, setLoadingOrder] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
 
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getCartProductAPI())
       .then(response => {
-        console.log('Response from API:', response);  // Kiểm tra response
         if (response.payload && Array.isArray(response.payload.items)) {
           setCartItems(response.payload.items);
         } else {
@@ -68,7 +65,7 @@ const CartPage = () => {
   };
 
   const handleRemoveCart = async (productId) => {
-    console.log("Đang xóa productId:", productId); // 👈 kiểm tra id gửi đi
+    console.log("Đang xóa productId:", productId);
     try {
       await dispatch(deleteCartProductAPI(productId));
       const response = await dispatch(getCartProductAPI());
@@ -79,8 +76,6 @@ const CartPage = () => {
       console.error("Lỗi khi xóa sản phẩm:", error);
     }
   };
-
-
 
   const total = cartItems && Array.isArray(cartItems) && cartItems.length > 0
     ? cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
@@ -97,35 +92,27 @@ const CartPage = () => {
       return;
     }
 
-    // Bổ sung phương thức thanh toán vào đơn hàng
     const orderWithPayment = { ...order, paymentMethod };
 
     try {
-      // Bắt đầu tạo đơn hàng
       const action = await dispatch(createOrderProductAPI(orderWithPayment));
 
       if (action.type === 'orders/createOrderProductAPI/fulfilled') {
         const orderId = action.payload._id;
 
-        // Xóa giỏ hàng sau khi đặt hàng thành công
         await Promise.all(cartItems.map(item => dispatch(deleteCartProductAPI(item.productId))));
         dispatch(clearCart());
 
-        // Cập nhật lại đơn hàng mới từ server
         await dispatch(getOrderProductAPI());
 
-        // Hiển thị thông báo thành công
         toast.success("Đơn hàng đã được đặt thành công!");
 
-        // Điều hướng tới trang kết quả đặt hàng thành công
         navigate(`/order-success?order_id=${orderId}`);
 
       } else {
-        // Xử lý khi tạo đơn hàng thất bại
         toast.error("Đặt hàng thất bại!");
       }
     } catch (err) {
-      // Xử lý lỗi khi có lỗi trong quá trình tạo đơn hàng
       toast.error("Lỗi khi đặt hàng: " + (err.response?.data?.message || err.message));
     }
   };
@@ -249,9 +236,6 @@ const CartPage = () => {
                     </Typography>
                   </Collapse>
                 </Box>
-
-
-
                 <Button
                   variant="contained"
                   color="error"
@@ -388,10 +372,7 @@ const CartPage = () => {
                       Xác nhận thông tin và hoàn tất
                     </Button>
                   </Box>
-
-
                 )}
-
               </CardContent>
             </Card>
           </Grid>

@@ -6,7 +6,7 @@ import { fetchAllUsers, deleteUserAPI, editUserAPI } from "../../redux/user/user
 
 const UsersTable = () => {
 	const [searchTerm, setSearchTerm] = useState("");
-	const [selectedUser, setSelectedUser] = useState(null); // For Edit
+	const [selectedUser, setSelectedUser] = useState(null);
 	const [editForm, setEditForm] = useState({
 		username: '',
 		email: '',
@@ -44,13 +44,11 @@ const UsersTable = () => {
 		});
 	};
 
-	// Handle Save Edit
-	// Handle Save Edit
 	const handleSaveEdit = async () => {
 		if (selectedUser && selectedUser._id) {
 			try {
 				await dispatch(editUserAPI({ userId: selectedUser._id, data: editForm })).unwrap();
-				dispatch(fetchAllUsers()); // Cập nhật lại danh sách người dùng
+				dispatch(fetchAllUsers());
 				setSelectedUser(null);
 			} catch (error) {
 				console.error("Failed to update user:", error);
@@ -64,7 +62,7 @@ const UsersTable = () => {
 
 	// Handle Delete Action
 	const handleDelete = (userId) => {
-		dispatch(deleteUserAPI(userId)); // Call the action to delete user
+		dispatch(deleteUserAPI(userId));
 	};
 
 	return (
@@ -111,7 +109,7 @@ const UsersTable = () => {
 							filteredUsers.map((user) => (
 
 								<motion.tr
-									key={user._id} // Use _id for MongoDB
+									key={user._id}
 									initial={{ opacity: 0 }}
 									animate={{ opacity: 1 }}
 									transition={{ duration: 0.3 }}
@@ -235,7 +233,7 @@ const UsersTable = () => {
 						</button>
 						<button
 							className="bg-gray-600 text-white px-4 py-2 rounded-lg"
-							onClick={() => setSelectedUser(null)} // Close the form without saving
+							onClick={() => setSelectedUser(null)}
 						>
 							Cancel
 						</button>

@@ -17,7 +17,6 @@ authorizedAxiosInstance.defaults.timeout = 1000 * 60 * 10
 //cho cokie
 authorizedAxiosInstance.defaults.withCredentials = true
 
-// Interceptor Request: can thiet vao giua request api
 authorizedAxiosInstance.interceptors.request.use((config) => {
   // Do something before request is sent
   interceptorLoadingElements(true)

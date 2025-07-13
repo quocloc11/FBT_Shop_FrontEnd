@@ -9,15 +9,13 @@ import UserActivityHeatmap from "../../components/AdminDashBoard/users/UserActiv
 import UserDemographicsChart from "../../components/AdminDashBoard/users/UserDemographicsChart.jsx";
 import { useSelector } from "react-redux";
 
-
-
 const UsersPage = () => {
 
-	const users = useSelector((state) => state.user.users); // lấy từ Redux
+	const users = useSelector((state) => state.user.users);
 
 	const userStats = {
 		totalUsers: users.length,
-		newUsersToday: 243, // tùy xử lý thêm
+		newUsersToday: 243,
 		activeUsers: 98520,
 		churnRate: "2.4%",
 	};

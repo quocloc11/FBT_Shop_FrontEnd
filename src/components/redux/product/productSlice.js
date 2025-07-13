@@ -8,7 +8,6 @@ const initialState = {
   loading: false
 }
 
-// Lấy danh sách sản phẩm
 export const getProductAPI = createAsyncThunk(
   'product/getProductAPI',
   async (_, { rejectWithValue }) => {
@@ -35,23 +34,19 @@ export const productSlice = createSlice({
         state.loading = true;
       })
       .addCase(getProductAPI.fulfilled, (state, action) => {
-        state.products = action.payload; // Cập nhật đúng mảng sản phẩm
+        state.products = action.payload;
         state.loading = false;
       })
       .addCase(getProductAPI.rejected, (state) => {
         state.loading = false;
       });
   }
-
-
 })
 
-// Selectors
 export const selectProducts = (state) => state.product.products;
 
 export const selectCurrentProduct = (state) => state.product.currentProduct;
 
-// Export action nếu cần dùng
 export const { setCurrentProduct } = productSlice.actions;
 
 export const productReducer = productSlice.reducer;

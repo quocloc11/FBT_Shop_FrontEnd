@@ -40,7 +40,6 @@ function Profiles() {
   }
   const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
-  //const currentUser = getProductAPI()
   const confirmLogout = useConfirm()
 
 
@@ -54,10 +53,9 @@ function Profiles() {
       .then(() => {
         dispatch(logOutAPI())
           .then(() => {
-            // ✅ Xóa giỏ hàng sau khi logout thành công
             dispatch(clearCart());
             console.log('Logout thành công!');
-            navigate('/login'); // Điều hướng sang trang login
+            navigate('/login');
           })
           .catch((error) => {
             console.error('Lỗi khi logout:', error);

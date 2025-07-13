@@ -6,7 +6,6 @@ import Avatar from '@mui/material/Avatar'
 import LockIcon from '@mui/icons-material/Lock'
 import Typography from '@mui/material/Typography'
 import { Card as MuiCard } from '@mui/material'
-//import { ReactComponent as TrelloIcon } from '../../assets/trello.svg'
 import TrelloIcon from '../../assets/trello.svg?react';
 
 import CardActions from '@mui/material/CardActions'
@@ -14,8 +13,6 @@ import TextField from '@mui/material/TextField'
 import Zoom from '@mui/material/Zoom'
 import Alert from '@mui/material/Alert'
 import { useForm } from 'react-hook-form'
-//import { useDispatch } from 'react-redux'
-// import { loginUserAPI } from '~/redux/user/userSlice'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import {
@@ -27,7 +24,6 @@ import {
 } from '../../utils/validators.js'
 import { loginAPI } from '../../components/redux/user/userSlice.js'
 import { useDispatch } from 'react-redux'
-//import FieldErrorAlert from '~/components/Form/FieldErrorAlert'
 
 
 function LoginForm() {
@@ -97,7 +93,6 @@ function LoginForm() {
                   }
                 })}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'email'} /> */}
             </Box>
             <Box sx={{ marginTop: '1em' }}>
               <TextField
@@ -114,7 +109,6 @@ function LoginForm() {
                   }
                 })}
               />
-              {/* <FieldErrorAlert errors={errors} fieldName={'password'} /> */}
             </Box>
           </Box>
           <CardActions sx={{ padding: '0 1em 1em 1em' }}>

@@ -11,7 +11,6 @@ const CartShopping = ({ cartCount }) => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={() => navigate(`/gio-hang`)}>
       <IconButton sx={{ color: 'white' }}>
-        {/* Thêm icon tài khoản hoặc biểu tượng khác nếu cần */}
       </IconButton>
       <Button
         variant="contained"

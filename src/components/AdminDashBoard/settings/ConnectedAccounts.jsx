@@ -8,7 +8,7 @@ const ConnectedAccounts = () => {
 			id: 1,
 			name: "Google",
 			connected: true,
-			icon: "/google.png", // Kiểm tra đảm bảo các hình ảnh này nằm trong thư mục public
+			icon: "/google.png",
 		},
 		{
 			id: 2,
@@ -48,8 +48,8 @@ const ConnectedAccounts = () => {
 					</div>
 					<button
 						className={`px-4 py-2 rounded ${account.connected
-								? "bg-green-600 hover:bg-green-700"
-								: "bg-gray-600 hover:bg-gray-700"
+							? "bg-green-600 hover:bg-green-700"
+							: "bg-gray-600 hover:bg-gray-700"
 							} transition duration-200`}
 						onClick={() => handleToggleConnection(account.id)}
 					>
